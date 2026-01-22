@@ -1,26 +1,7 @@
-// import ProductsCard from "../components/ProductsCard";
-// import Headphone from "../assets/Headphone"
-
-
-// const Products = () => {
-//   return (
-//     <div className="cards-flex">
-//       <ProductsCard name="Wireless Headphones" img="{Headphone}" price="$99.99" category="Electronics" />
-//       <ProductsCard name="Smart Watch" img="/images/smartwatch.jpg" price="$199.99" category="Electronics" />
-//       <ProductsCard name="Running Shoes" img="/images/shoes.jpg" price="$79.99" category="Fashion" />
-//       <ProductsCard name="Leather Handbag" img="/images/handbag.jpg" price="$149.99" category="Fashion" />
-//     </div>
-//   )
-// }
-
-// export default Products;
 import image1 from "../assets/HeadPhone.jpg";
 import image2 from "../assets/Watch.jpg";
 import image3 from "../assets/running shoe.jpg";
 import image4 from "../assets/Backpack.jpg"
-
-
-
 
 const products = [
   {

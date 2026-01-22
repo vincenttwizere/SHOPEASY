@@ -379,8 +379,8 @@
   padding: 20px;
   width: 60%;
   height: 180px;
-  object-fit: cover;
-}
+  object-fit: contain;
+} 
 
 /* Info */
 .product-info {
