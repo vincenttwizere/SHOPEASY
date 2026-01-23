@@ -1,21 +1,14 @@
-import image1 from "../assets/Headphone.jpg"
-const product = {
-  id: 1,
-  name: "Wireless Headphones",
-  price: 59.99,
-  category: "Electronics",
-  description:
-    "High-quality wireless headphones with noise cancellation, long battery life, and premium sound quality. Perfect for daily use and travel.",
-  image: image1,
-  features: [
-    "Bluetooth connectivity",
-    "Noise cancellation",
-    "20-hour battery life",
-    "Built-in microphone",
-  ],
-};
+const Details = ({ product }) => {
+  if (!product) {
+    return (
+      <div className="details-page">
+        <div className="details-container">
+          <p>Product not found</p>
+        </div>
+      </div>
+    );
+  }
 
-const Details = () => {
   return (
     <div className="details-page">
 

@@ -1,12 +1,12 @@
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 
-const Footer = () => {
+const Footer = ({ onNavigate }) => {
   return (
     <footer className="footer">
       <div className="footer-container">
         {/* Left: Brand */}
         <div className="footer-brand">
-          <h2>SHOPEASY</h2>
+          <h2 onClick={() => onNavigate && onNavigate('home')} style={{ cursor: 'pointer' }}>SHOPEASY</h2>
           <p>Building your online shopping experience.</p>
         </div>
 
@@ -14,10 +14,10 @@ const Footer = () => {
         <div className="footer-links">
           <h4>Quick Links</h4>
           <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/about">About</a></li>
-            <li><a href="/contact">Contact</a></li>
+            <li><a onClick={() => onNavigate && onNavigate('home')} style={{ cursor: 'pointer' }}>Home</a></li>
+            <li><a onClick={() => onNavigate && onNavigate('categories')} style={{ cursor: 'pointer' }}>Categories</a></li>
+            <li><a onClick={() => onNavigate && onNavigate('about')} style={{ cursor: 'pointer' }}>About</a></li>
+            <li><a onClick={() => onNavigate && onNavigate('contact')} style={{ cursor: 'pointer' }}>Contact</a></li>
           </ul>
         </div>
 
