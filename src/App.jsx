@@ -62,7 +62,7 @@ const App = () => {
 
       {/* Details Page */}
       {currentPage === 'details' && selectedProduct && (
-        <Details product={selectedProduct} />
+        <Details product={selectedProduct} onNavigate={handleNavigate} />
       )}
 
       {/* Categories Page */}

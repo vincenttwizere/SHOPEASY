@@ -1,4 +1,4 @@
-const Details = ({ product }) => {
+const Details = ({ product, onNavigate }) => {
   if (!product) {
     return (
       <div className="details-page">
@@ -40,6 +40,18 @@ const Details = ({ product }) => {
             <button className="add-cart-btn">Add to Cart</button>
             <button className="buy-btn">Buy Now</button>
           </div>
+
+          {/* Back to Products */}
+          {onNavigate && (
+            <div className="details-footer">
+              <button 
+                className="back-btn"
+                onClick={() => onNavigate('products')}
+              >
+                ← View More Products
+              </button>
+            </div>
+          )}
         </div>
 
       </div>
