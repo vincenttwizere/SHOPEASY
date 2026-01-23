@@ -4,7 +4,6 @@ import Card from "./components/Card"
 import Products from "./pages/Products"
 import Categories from "./pages/Categories"
 import Details from "./pages/Details"
-import About from "./pages/About Us"
 import Contact from "./pages/Contact"
 import Footer from "./components/Footer"
 const App = () => {   
@@ -37,7 +36,6 @@ const App = () => {
       <Products />
       <Categories />
       <Details />
-      <About />
       <Contact />
 
 
