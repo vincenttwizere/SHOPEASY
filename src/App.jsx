@@ -76,9 +76,9 @@ const App = () => {
       )}
 
       {/* Contact Page */}
-      {currentPage === 'contact' && (
+      
         <Contact />
-      )}
+     
 
       <Footer onNavigate={handleNavigate} />
     </div>

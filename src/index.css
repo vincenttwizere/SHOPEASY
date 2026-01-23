@@ -153,6 +153,47 @@
   transition: background 0.2s ease;
 }
 
+/* Tablets */
+@media (max-width: 1024px) {
+  .discover {
+    margin: 50px 150px;
+  }
+}
+
+/* Small tablets */
+@media (max-width: 768px) {
+  .discover {
+    margin: 40px 60px;
+  }
+
+  .discover-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .discover {
+    margin: 30px 16px;
+    padding: 30px 12px;
+  }
+
+  .discover-buttons {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    align-items: center;
+  }
+
+  .discover .btn2 {
+    width: 100%;
+    max-width: 240px;
+  }
+}
+
+/* Discover Section */
+
 .card {
   background-color: #ffffff;
   border-radius: 18px; 
