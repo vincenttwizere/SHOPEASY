@@ -1,38 +1,61 @@
+import { useState } from "react";
+import { Search, Menu, X } from "lucide-react";
 
 const Navbar = ({ onNavigate }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
-    return (
-        <div className="navbar">
-            <div className = 'logo'>
-                <h1 onClick={() => onNavigate('home')} style={{ cursor: 'pointer' }}>SHOPEASY</h1>
-                <p>Your one-stop <br /> shopping destination</p>
-            </div>
+  return (
+    <div className="navbar">
+      <div className="logo">
+        <h1 onClick={() => onNavigate("home")} style={{ cursor: "pointer" }}>
+          SHOPEASY
+        </h1>
+        <p>Your one-stop <br /> shopping destination</p>
+      </div>
 
-            <div className="nav-links">
-                <a onClick={() => onNavigate('home')} style={{ cursor: 'pointer' }}>Home</a>
-                <a onClick={() => onNavigate('products')} style={{ cursor: 'pointer' }}>Products</a>
-                <a onClick={() => onNavigate('categories')} style={{ cursor: 'pointer' }}>Categories</a>
-                <a onClick={() => onNavigate('about')} style={{ cursor: 'pointer' }}>About Us</a>
-                <a onClick={() => onNavigate('contact')} style={{ cursor: 'pointer' }}>Contact</a>
-            </div>
-          <div className="search-bar">
-            <div className="search-box">
-                <input
-                type="text"
-                placeholder="Search products..."
-                aria-label="Search products"
-                />
-                <button className="btn primary">Search</button>
-            </div>
+      {/* Hamburger menu (mobile only) */}
+      <div className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
+        {menuOpen ? <X size={28} /> : <Menu size={28} />}
+      </div>
 
-            <div className="search-actions">
-                <button className="btn">Account</button>
-                <button className="btn">Wishlist</button>
-            </div>
+      <div className={`nav-links ${menuOpen ? "active" : ""}`}>
+        <a onClick={() => onNavigate("home")} style={{ cursor: "pointer" }}>Home</a>
+        <a onClick={() => onNavigate("products")} style={{ cursor: "pointer" }}>Products</a>
+        <a onClick={() => onNavigate("categories")} style={{ cursor: "pointer" }}>Categories</a>
+        <a onClick={() => onNavigate("about")} style={{ cursor: "pointer" }}>About Us</a>
+        <a onClick={() => onNavigate("contact")} style={{ cursor: "pointer" }}>Contact</a>
+      </div>
+
+      {/* Desktop Search Bar */}
+      <div className="search-bar">
+        <div className="search-box">
+          <input type="text" placeholder="Search products..." />
+          <button className="btn primary">Search</button>
         </div>
 
+        <div className="search-actions">
+          <button className="btn">Account</button>
+          <button className="btn">Wishlist</button>
         </div>
-    );
-}
+      </div>
+
+      {/* Mobile Search Icon */}
+      <div className="mobile-search-icon" onClick={() => setSearchOpen(!searchOpen)}>
+        <Search size={24} color="#fff" />
+      </div>
+
+      {/* Mobile Search Bar */}
+      {searchOpen && (
+        <div className="mobile-search-bar active">
+          <div className="search-box">
+            <input type="text" placeholder="Search products..." />
+            <button className="btn primary">Search</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default Navbar;
