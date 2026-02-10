@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Search, Menu, X } from "lucide-react";
 
-const Navbar = ({ onNavigate }) => {
+const Navbar = ({ onNavigate, onSearch, user, onAccountClick, onLogout }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState('');
 
   return (
     <div className="navbar">
@@ -23,6 +24,9 @@ const Navbar = ({ onNavigate }) => {
         <a onClick={() => onNavigate("home")} style={{ cursor: "pointer" }}>Home</a>
         <a onClick={() => onNavigate("products")} style={{ cursor: "pointer" }}>Products</a>
         <a onClick={() => onNavigate("categories")} style={{ cursor: "pointer" }}>Categories</a>
+        {user && user.role === 'admin' && (
+          <a onClick={() => onNavigate("admin")} style={{ cursor: "pointer" }}>Admin</a>
+        )}
         <a onClick={() => onNavigate("about")} style={{ cursor: "pointer" }}>About Us</a>
         <a onClick={() => onNavigate("contact")} style={{ cursor: "pointer" }}>Contact</a>
       </div>
@@ -30,12 +34,20 @@ const Navbar = ({ onNavigate }) => {
       {/* Desktop Search Bar */}
       <div className="search-bar">
         <div className="search-box">
-          <input type="text" placeholder="Search products..." />
-          <button className="btn primary">Search</button>
+          <input value={query} onChange={(e) => setQuery(e.target.value)} type="text" placeholder="Search products..." />
+          <button className="btn primary" onClick={() => onSearch && onSearch(query)}>Search</button>
         </div>
 
         <div className="search-actions">
-          <button className="btn">Account</button>
+          <button className="btn" onClick={() => onNavigate && onNavigate('cart')}>Cart</button>
+          {!user ? (
+            <button className="btn" onClick={() => onAccountClick && onAccountClick()}>Account</button>
+          ) : (
+            <>
+              <button className="btn">{user.name || 'Account'}</button>
+              <button className="btn" onClick={() => onLogout && onLogout()}>Logout</button>
+            </>
+          )}
           <button className="btn">Wishlist</button>
         </div>
       </div>
@@ -49,8 +61,8 @@ const Navbar = ({ onNavigate }) => {
       {searchOpen && (
         <div className="mobile-search-bar active">
           <div className="search-box">
-            <input type="text" placeholder="Search products..." />
-            <button className="btn primary">Search</button>
+            <input value={query} onChange={(e) => setQuery(e.target.value)} type="text" placeholder="Search products..." />
+            <button className="btn primary" onClick={() => onSearch && onSearch(query)}>Search</button>
           </div>
         </div>
       )}

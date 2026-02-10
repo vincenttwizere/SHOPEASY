@@ -1,4 +1,4 @@
-const Details = ({ product, onNavigate }) => {
+const Details = ({ product, onNavigate, onAddToCart, onBuyNow }) => {
   if (!product) {
     return (
       <div className="details-page">
@@ -30,15 +30,15 @@ const Details = ({ product, onNavigate }) => {
 
           {/* Features */}
           <ul className="features">
-            {product.features.map((feature, index) => (
+            {(product.features || []).map((feature, index) => (
               <li key={index}>{feature}</li>
             ))}
           </ul>
 
           {/* Actions */}
           <div className="details-actions">
-            <button className="add-cart-btn">Add to Cart</button>
-            <button className="buy-btn">Buy Now</button>
+            <button className="add-cart-btn" onClick={() => onAddToCart && onAddToCart(product, 1)}>Add to Cart</button>
+            <button className="buy-btn" onClick={() => onBuyNow && onBuyNow(product, 1)}>Buy Now</button>
           </div>
 
           {/* Back to Products */}
