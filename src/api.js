@@ -55,4 +55,17 @@ export async function removeCartItem(itemId) { return request(`/api/cart/items/$
 export async function placeOrder() { return request('/api/orders', { method: 'POST' }); }
 export async function getOrders() { return request('/api/orders'); }
 
-export default { getProducts, getProduct, register, login, saveToken, clearToken, getCart, addToCart, updateCartItem, removeCartItem, placeOrder, getOrders };
+// Wishlist (local storage)
+export function getWishlist() { return JSON.parse(localStorage.getItem('wishlist') || '[]'); }
+export function addToWishlist(productId) {
+  const list = getWishlist();
+  if (!list.includes(productId)) list.push(productId);
+  localStorage.setItem('wishlist', JSON.stringify(list));
+}
+export function removeFromWishlist(productId) {
+  const list = getWishlist();
+  localStorage.setItem('wishlist', JSON.stringify(list.filter(id => id !== productId)));
+}
+export function isInWishlist(productId) { return getWishlist().includes(productId); }
+
+export default { getProducts, getProduct, register, login, saveToken, clearToken, getCart, addToCart, updateCartItem, removeCartItem, placeOrder, getOrders, getWishlist, addToWishlist, removeFromWishlist, isInWishlist };

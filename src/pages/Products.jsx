@@ -39,6 +39,7 @@ export default function Products({ onViewDetails, items: propItems, searchQuery 
       <div className="products-header">
         <h1>Our Products</h1>
         <p>Browse our collection of quality products</p>
+        {searchQuery && <p className="search-result">Showing results for "<strong>{searchQuery}</strong>"</p>}
       </div>
 
       <div className="products-filters">
@@ -59,6 +60,7 @@ export default function Products({ onViewDetails, items: propItems, searchQuery 
 
       <div className="products-grid">
         {loading && <p>Loading products...</p>}
+        {!loading && items.length === 0 && <p>No products found{searchQuery && ` matching "${searchQuery}"`}.</p>}
         {items.map((product) => (
           <div className="product-card" key={product.id}>
             <img src={product.image} className="object-c" alt={product.name} />

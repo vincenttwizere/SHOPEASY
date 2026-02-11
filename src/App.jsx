@@ -10,7 +10,8 @@ import Footer from "./components/Footer"
 import About from "./pages/About Us"
 import AuthModal from './components/AuthModal'
 import Cart from './pages/Cart'
-import { addToCart as apiAddToCart, placeOrder } from './api'
+import Wishlist from './pages/Wishlist'
+import { addToCart as apiAddToCart, placeOrder, addToWishlist, removeFromWishlist, isInWishlist } from './api'
 import AdminProducts from './pages/AdminProducts'
 
 const App = () => {
@@ -70,6 +71,14 @@ const App = () => {
     }
   }
 
+  const handleWishlistToggle = (productId) => {
+    if (isInWishlist(productId)) {
+      removeFromWishlist(productId);
+    } else {
+      addToWishlist(productId);
+    }
+  };
+
   async function handlePlaceOrder() {
     if (!user) return setAuthOpen(true);
     try {
@@ -123,7 +132,7 @@ const App = () => {
 
       {/* Details Page */}
       {currentPage === 'details' && selectedProduct && (
-        <Details product={selectedProduct} onNavigate={handleNavigate} onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />
+        <Details product={selectedProduct} onNavigate={handleNavigate} onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} onWishlistToggle={handleWishlistToggle} isInWishlist={isInWishlist} />
       )}
 
       {currentPage === 'admin' && user && user.role === 'admin' && (
@@ -133,6 +142,11 @@ const App = () => {
       {/* Cart Page */}
       {currentPage === 'cart' && (
         <Cart onPlaceOrder={handlePlaceOrder} />
+      )}
+
+      {/* Wishlist Page */}
+      {currentPage === 'wishlist' && (
+        <Wishlist onViewDetails={handleViewDetails} />
       )}
 
       {/* Categories Page */}

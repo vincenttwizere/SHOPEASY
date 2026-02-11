@@ -1,0 +1,1 @@
+mysql -u root -p < "C:\Users\Olivin\Desktop\INTANGO Projects\SHOPEASY\shop\backend\sql\schema.sql"

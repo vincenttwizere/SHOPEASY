@@ -1,4 +1,4 @@
-const Details = ({ product, onNavigate, onAddToCart, onBuyNow }) => {
+const Details = ({ product, onNavigate, onAddToCart, onBuyNow, onWishlistToggle, isInWishlist }) => {
   if (!product) {
     return (
       <div className="details-page">
@@ -39,6 +39,9 @@ const Details = ({ product, onNavigate, onAddToCart, onBuyNow }) => {
           <div className="details-actions">
             <button className="add-cart-btn" onClick={() => onAddToCart && onAddToCart(product, 1)}>Add to Cart</button>
             <button className="buy-btn" onClick={() => onBuyNow && onBuyNow(product, 1)}>Buy Now</button>
+            <button className={`wishlist-btn ${isInWishlist && isInWishlist(product.id) ? 'active' : ''}`} onClick={() => onWishlistToggle && onWishlistToggle(product.id)}>
+              {isInWishlist && isInWishlist(product.id) ? '❤️ Wishlist' : '🤍 Wishlist'}
+            </button>
           </div>
 
           {/* Back to Products */}

@@ -48,7 +48,7 @@ const Navbar = ({ onNavigate, onSearch, user, onAccountClick, onLogout }) => {
               <button className="btn" onClick={() => onLogout && onLogout()}>Logout</button>
             </>
           )}
-          <button className="btn">Wishlist</button>
+          <button className="btn" onClick={() => onNavigate && onNavigate('wishlist')}>Wishlist</button>
         </div>
       </div>
 
