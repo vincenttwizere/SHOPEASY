@@ -1,10 +1,26 @@
 import { useState } from 'react';
 import { login, register, saveToken } from '../api';
 
-const parseJwt = (token) => {
+const base64UrlDecode = (str) => {
+  // Replace URL-safe characters, add padding, then decode
   try {
-    const [, payload] = token.split('.');
-    return JSON.parse(atob(payload));
+    let s = str.replace(/-/g, '+').replace(/_/g, '/');
+    while (s.length % 4) s += '=';
+    // atob works in browser
+    return atob(s);
+  } catch {
+    return null;
+  }
+};
+
+const parseJwt = (token) => {
+  if (!token) return null;
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+    const payload = base64UrlDecode(parts[1]);
+    if (!payload) return null;
+    return JSON.parse(payload);
   } catch { return null; }
 };
 

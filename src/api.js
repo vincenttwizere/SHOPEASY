@@ -9,10 +9,26 @@ async function request(path, opts = {}) {
   const headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {}, tokenHeader());
   const res = await fetch(`${BASE}${path}`, Object.assign({}, opts, { headers }));
   if (!res.ok) {
-    const text = await res.text();
-    let msg = text;
-    try { msg = JSON.parse(text); } catch {}
-    throw new Error(msg.message || res.statusText || 'API Error');
+    // Try to parse JSON error body, fallback to plain text/status
+    let message = res.statusText || 'API Error';
+    try {
+      const bodyText = await res.text();
+      if (bodyText) {
+        try {
+          const body = JSON.parse(bodyText);
+          if (body && body.message) message = body.message;
+          else if (typeof body === 'string') message = body;
+        } catch {
+          // not JSON, use raw text
+          message = bodyText;
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+    const err = new Error(message || 'API Error');
+    err.status = res.status;
+    throw err;
   }
   if (res.status === 204) return null;
   return res.json();
