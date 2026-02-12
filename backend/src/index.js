@@ -10,7 +10,16 @@ const { errorHandler } = require('./middleware/errorHandler');
 const app = express();
 
 app.use(express.json());
-app.use(cors({ origin: config.FRONTEND_ORIGIN }));
+// Log incoming requests to help debug "Failed to fetch" issues
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} ${req.method} ${req.url}`);
+  next();
+});
+
+// Enable CORS for configured frontend origin. During local development,
+// if FRONTEND_ORIGIN is not set, allow all origins to help debugging.
+const corsOptions = config.FRONTEND_ORIGIN ? { origin: config.FRONTEND_ORIGIN } : { origin: true };
+app.use(cors(corsOptions));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
