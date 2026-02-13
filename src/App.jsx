@@ -19,6 +19,13 @@ import AdminOrders from './pages/admin/AdminOrders'
 import AdminUsers from './pages/admin/AdminUsers'
 import { RequireAuth, RequireAdmin } from './components/ProtectedRoute'
 import { addToCart as apiAddToCart, placeOrder, addToWishlist, removeFromWishlist, isInWishlist } from './api'
+import AdminMessages from './pages/admin/AdminMessages'
+import AdminAnalytics from './pages/admin/AdminAnalytics'
+import AdminInvoice from './pages/admin/AdminInvoice'
+import AdminDiscounts from './pages/admin/AdminDiscounts'
+import AdminSettings from './pages/admin/AdminSettings'
+import AdminSecurity from './pages/admin/AdminSecurity'
+import AdminHelp from './pages/admin/AdminHelp'
 
 const parseJwt = (token) => {
   if (!token) return null;
@@ -182,13 +189,20 @@ const App = () => {
         {/* Admin Routes */}
         <Route path="/admin" element={
           <RequireAdmin>
-            <AdminLayout onLogout={handleLogout} />
+            <AdminLayout onLogout={handleLogout} user={user} />
           </RequireAdmin>
         }>
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="users" element={<AdminUsers />} />
+          <Route path="messages" element={<AdminMessages />} />
+          <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="invoice" element={<AdminInvoice />} />
+          <Route path="discounts" element={<AdminDiscounts />} />
+          <Route path="settings" element={<AdminSettings />} />
+          <Route path="security" element={<AdminSecurity />} />
+          <Route path="help" element={<AdminHelp />} />
         </Route>
       </Routes>
 
