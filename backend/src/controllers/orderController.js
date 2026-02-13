@@ -78,4 +78,47 @@ async function getOrder(req, res, next) {
   }
 }
 
-module.exports = { placeOrder, listOrders, getOrder };
+// Admin: Get all orders
+async function getAllOrders(req, res, next) {
+  try {
+    const [orders] = await db.query(
+      `SELECT o.id, o.user_id, u.name as user_name, u.email, o.total, o.status, o.created_at 
+       FROM orders o 
+       JOIN users u ON o.user_id = u.id 
+       ORDER BY o.created_at DESC`
+    );
+    res.json(orders);
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Admin: Update order status
+async function updateOrderStatus(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    if (!['pending', 'shipped', 'delivered', 'cancelled'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status' });
+    }
+    await db.query('UPDATE orders SET status = ? WHERE id = ?', [status, id]);
+    res.json({ message: 'Order status updated' });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Admin: Get user statistics
+async function getUserStats(req, res, next) {
+  try {
+    const [[{ totalUsers }]] = await db.query('SELECT COUNT(*) as totalUsers FROM users');
+    const [[{ totalOrders }]] = await db.query('SELECT COUNT(*) as totalOrders FROM orders');
+    const [[{ totalRevenue }]] = await db.query('SELECT COALESCE(SUM(total), 0) as totalRevenue FROM orders WHERE status != "cancelled"');
+    const [[{ totalProducts }]] = await db.query('SELECT COUNT(*) as totalProducts FROM products');
+    res.json({ totalUsers, totalOrders, totalRevenue, totalProducts });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { placeOrder, listOrders, getOrder, getAllOrders, updateOrderStatus, getUserStats };

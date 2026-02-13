@@ -1,10 +1,13 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const config = require('./config/config');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const cartRoutes = require('./routes/cart');
 const orderRoutes = require('./routes/orders');
+const userRoutes = require('./routes/users');
+const uploadRoutes = require('./routes/upload');
 const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
@@ -21,10 +24,15 @@ app.use((req, res, next) => {
 const corsOptions = config.FRONTEND_ORIGIN ? { origin: config.FRONTEND_ORIGIN } : { origin: true };
 app.use(cors(corsOptions));
 
+// Serve uploaded images statically
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/upload', uploadRoutes);
 
 app.use(errorHandler);
 

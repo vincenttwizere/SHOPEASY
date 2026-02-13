@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from "./components/Navbar"
 import Discover from "./components/Discover"
 import Card from "./components/Card"
@@ -11,43 +12,96 @@ import About from "./pages/About Us"
 import AuthModal from './components/AuthModal'
 import Cart from './pages/Cart'
 import Wishlist from './pages/Wishlist'
+import AdminLayout from './components/AdminLayout'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminProducts from './pages/admin/AdminProducts'
+import AdminOrders from './pages/admin/AdminOrders'
+import AdminUsers from './pages/admin/AdminUsers'
+import { RequireAuth, RequireAdmin } from './components/ProtectedRoute'
 import { addToCart as apiAddToCart, placeOrder, addToWishlist, removeFromWishlist, isInWishlist } from './api'
-import AdminProducts from './pages/AdminProducts'
+
+const parseJwt = (token) => {
+  if (!token) return null;
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+    const payload = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
+    return JSON.parse(payload);
+  } catch {
+    return null;
+  }
+};
+
+function HomePage({ onViewDetails }) {
+  return (
+    <div>
+      <p className="passage">Free shipping on orders over $50 | Same-day delivery available</p>
+      <Discover />
+      <p className="passage2">Why Choose Us</p>
+
+      <div className="cards-flex">
+        <Card title="Free Shipping" description="Free delivery on orders over $50. Fast and reliable shipping nationwide." icon="shipping" />
+        <Card title="Easy Returns" description="30-day return policy. No questions asked for easy hassle-free returns." icon="returns" />
+        <Card title="Secure Payment" description="Secure payment processing with SSL encryption and fraud protection." icon="payment" />
+        <Card title="Quality Guaranteed" description="All products are quality checked and come with manufacturer warranty." icon="quality" />
+      </div>
+
+      <p className="passage2">Shop by Category</p>
+
+      <div className="cards-flex">
+        <Card title="Electronics" description="Smart Phone, Laptop, and Accessories." icon="Electronics" />
+        <Card title="Fashion" description="Clothing, shoes, and accessories for all seasons." icon="Fashion" />
+        <Card title="Home & Kitchen" description="Everything you need to make your home comfortable." icon="Home & Kitchen" />
+        <Card title="Beauty & Health" description="Skincare, makeup, and health products for everyone." icon="Beauty & Health" />
+      </div>
+
+      <Products onViewDetails={onViewDetails} />
+      <Categories />
+    </div>
+  );
+}
 
 const App = () => {
-  const [currentPage, setCurrentPage] = useState('home');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [authOpen, setAuthOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    // try to initialize user from token
+    // Initialize user from token
     const token = localStorage.getItem('token');
     if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        setUser(payload);
-      } catch (e) { /* ignore */ }
+      const payload = parseJwt(token);
+      setUser(payload);
     }
   }, []);
 
   const handleViewDetails = (product) => {
     setSelectedProduct(product);
-    setCurrentPage('details');
-  };
-  const handleNavigate = (page) => {
-    setCurrentPage(page);
-    setSelectedProduct(null);
+    navigate('/details');
   };
 
   const handleOpenAuth = () => setAuthOpen(true);
   const handleCloseAuth = () => setAuthOpen(false);
-  const handleLogin = (u) => { setUser(u); };
+
+  const handleLogin = (u) => {
+    setUser(u);
+    // Role-based redirect
+    if (u.role === 'admin') {
+      navigate('/admin');
+    } else {
+      // Redirect to previous page or home
+      const from = location.state?.from || '/';
+      navigate(from);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     setUser(null);
+    navigate('/');
   };
 
   async function handleAddToCart(product, quantity = 1) {
@@ -64,8 +118,7 @@ const App = () => {
     if (!user) return setAuthOpen(true);
     try {
       await apiAddToCart({ productId: product.id, quantity });
-      // redirect to cart for checkout
-      setCurrentPage('cart');
+      navigate('/cart');
     } catch (err) {
       alert(err.message || 'Failed to process buy now');
     }
@@ -84,87 +137,62 @@ const App = () => {
     try {
       const res = await placeOrder();
       alert(`Order ${res.orderId} placed — total $${res.total}`);
-      setCurrentPage('home');
-    } catch (err) { alert(err.message || 'Checkout failed'); }
+      navigate('/');
+    } catch (err) {
+      alert(err.message || 'Checkout failed');
+    }
   }
 
   const handleSearch = (q) => {
     setSearchQuery(q || '');
-    setCurrentPage('products');
+    navigate('/products');
   };
 
   return (
     <div>
-      <Navbar onNavigate={handleNavigate} onAccountClick={handleOpenAuth} onSearch={handleSearch} user={user} onLogout={handleLogout} />
-      
-      {/* Home Page */}
-      {currentPage === 'home' && (
-        <div>
-          <p className="passage">Free shipping on orders over $50 | Same-day delivery available</p>
-          <Discover />
-          <p className="passage2">Why Choose Us</p>
-
-          <div className="cards-flex">
-            <Card title="Free Shipping" description="Free delivery on orders over $50. Fast and reliable shipping nationwide." icon="shipping"/>
-            <Card title="Easy Returns" description="30-day return policy. No questions asked for easy hassle-free returns." icon="returns"/>
-            <Card title="Secure Payment" description="Secure payment processing with SSL encryption and fraud protection." icon="payment"/>
-            <Card title="Quality Guaranteed" description="All products are quality checked and come with manufacturer warranty." icon="quality"/>
-          </div>
-
-          <p className="passage2">Shop by Category</p>
-
-          <div className="cards-flex">
-            <Card title="Electronics" description="Smart Phone, Laptop, and Accessories." icon="Electronics"/>
-            <Card title="Fashion" description="Clothing, shoes, and accessories for all seasons." icon="Fashion"/>
-            <Card title="Home & Kitchen" description="Everything you need to make your home comfortable." icon="Home & Kitchen"/>
-            <Card title="Beauty & Health" description="Skincare, makeup, and health products for everyone." icon="Beauty & Health"/>
-          </div>
-
-          <Products onViewDetails={handleViewDetails} />
-          <Categories />
-        </div>
+      {/* Show Navbar and Footer only for non-admin routes */}
+      {!location.pathname.startsWith('/admin') && (
+        <Navbar onSearch={handleSearch} onAccountClick={handleOpenAuth} user={user} onLogout={handleLogout} />
       )}
 
-      {/* Products Page */}
-      {currentPage === 'products' && (
-        <Products onViewDetails={handleViewDetails} searchQuery={searchQuery} />
-      )}
+      <Routes>
+        <Route path="/" element={<HomePage onViewDetails={handleViewDetails} />} />
+        <Route path="/products" element={<Products onViewDetails={handleViewDetails} searchQuery={searchQuery} />} />
+        <Route path="/details" element={
+          selectedProduct ? (
+            <Details
+              product={selectedProduct}
+              onAddToCart={handleAddToCart}
+              onBuyNow={handleBuyNow}
+              onWishlistToggle={handleWishlistToggle}
+              isInWishlist={isInWishlist}
+            />
+          ) : <div>Product not found</div>
+        } />
+        <Route path="/cart" element={
+          <RequireAuth>
+            <Cart onPlaceOrder={handlePlaceOrder} />
+          </RequireAuth>
+        } />
+        <Route path="/wishlist" element={<Wishlist onViewDetails={handleViewDetails} />} />
+        <Route path="/categories" element={<Categories />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
 
-      {/* Details Page */}
-      {currentPage === 'details' && selectedProduct && (
-        <Details product={selectedProduct} onNavigate={handleNavigate} onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} onWishlistToggle={handleWishlistToggle} isInWishlist={isInWishlist} />
-      )}
+        {/* Admin Routes */}
+        <Route path="/admin" element={
+          <RequireAdmin>
+            <AdminLayout onLogout={handleLogout} />
+          </RequireAdmin>
+        }>
+          <Route index element={<AdminDashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="users" element={<AdminUsers />} />
+        </Route>
+      </Routes>
 
-      {currentPage === 'admin' && user && user.role === 'admin' && (
-        <AdminProducts />
-      )}
-
-      {/* Cart Page */}
-      {currentPage === 'cart' && (
-        <Cart onPlaceOrder={handlePlaceOrder} />
-      )}
-
-      {/* Wishlist Page */}
-      {currentPage === 'wishlist' && (
-        <Wishlist onViewDetails={handleViewDetails} />
-      )}
-
-      {/* Categories Page */}
-      {currentPage === 'categories' && (
-        <Categories />
-      )}
-
-      {/* About Page */}
-      {currentPage === 'about' && (
-        <About />
-      )}
-
-      {/* Contact Page */}
-      
-        <Contact />
-     
-
-      <Footer onNavigate={handleNavigate} />
+      {!location.pathname.startsWith('/admin') && <Footer />}
 
       {authOpen && <AuthModal onClose={handleCloseAuth} onLogin={(u) => { handleLogin(u); handleCloseAuth(); }} />}
     </div>

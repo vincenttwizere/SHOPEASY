@@ -1,12 +1,13 @@
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const Footer = ({ onNavigate }) => {
+const Footer = () => {
   return (
     <footer className="footer">
       <div className="footer-container">
         {/* Left: Brand */}
         <div className="footer-brand">
-          <h2 onClick={() => onNavigate && onNavigate('home')} style={{ cursor: 'pointer' }}>SHOPEASY</h2>
+          <Link to="/"><h2>SHOPEASY</h2></Link>
           <p>Building your online shopping experience.</p>
         </div>
 
@@ -14,10 +15,10 @@ const Footer = ({ onNavigate }) => {
         <div className="footer-links">
           <h4>Quick Links</h4>
           <ul>
-            <li><a onClick={() => onNavigate && onNavigate('home')} style={{ cursor: 'pointer' }}>Home</a></li>
-            <li><a onClick={() => onNavigate && onNavigate('categories')} style={{ cursor: 'pointer' }}>Categories</a></li>
-            <li><a onClick={() => onNavigate && onNavigate('about')} style={{ cursor: 'pointer' }}>About</a></li>
-            <li><a onClick={() => onNavigate && onNavigate('contact')} style={{ cursor: 'pointer' }}>Contact</a></li>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/categories">Categories</Link></li>
+            <li><Link to="/about">About</Link></li>
+            <li><Link to="/contact">Contact</Link></li>
           </ul>
         </div>
 
@@ -35,7 +36,7 @@ const Footer = ({ onNavigate }) => {
       </div>
 
       <div className="footer-bottom">
-        &copy; {new Date().getFullYear()} shoteasy. All rights reserved.j
+        &copy; {new Date().getFullYear()} ShopEasy. All rights reserved.
       </div>
     </footer>
   );

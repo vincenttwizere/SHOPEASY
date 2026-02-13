@@ -1,15 +1,17 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, Menu, X } from "lucide-react";
 
-const Navbar = ({ onNavigate, onSearch, user, onAccountClick, onLogout }) => {
+const Navbar = ({ onSearch, user, onAccountClick, onLogout }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const navigate = useNavigate();
 
   return (
     <div className="navbar">
       <div className="logo">
-        <h1 onClick={() => onNavigate("home")} style={{ cursor: "pointer" }}>
+        <h1 onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
           SHOPEASY
         </h1>
         <p>Your one-stop <br /> shopping destination</p>
@@ -21,14 +23,14 @@ const Navbar = ({ onNavigate, onSearch, user, onAccountClick, onLogout }) => {
       </div>
 
       <div className={`nav-links ${menuOpen ? "active" : ""}`}>
-        <a onClick={() => onNavigate("home")} style={{ cursor: "pointer" }}>Home</a>
-        <a onClick={() => onNavigate("products")} style={{ cursor: "pointer" }}>Products</a>
-        <a onClick={() => onNavigate("categories")} style={{ cursor: "pointer" }}>Categories</a>
+        <Link to="/">Home</Link>
+        <Link to="/products">Products</Link>
+        <Link to="/categories">Categories</Link>
         {user && user.role === 'admin' && (
-          <a onClick={() => onNavigate("admin")} style={{ cursor: "pointer" }}>Admin</a>
+          <Link to="/admin">Admin</Link>
         )}
-        <a onClick={() => onNavigate("about")} style={{ cursor: "pointer" }}>About Us</a>
-        <a onClick={() => onNavigate("contact")} style={{ cursor: "pointer" }}>Contact</a>
+        <Link to="/about">About Us</Link>
+        <Link to="/contact">Contact</Link>
       </div>
 
       {/* Desktop Search Bar */}
@@ -39,7 +41,7 @@ const Navbar = ({ onNavigate, onSearch, user, onAccountClick, onLogout }) => {
         </div>
 
         <div className="search-actions">
-          <button className="btn" onClick={() => onNavigate && onNavigate('cart')}>Cart</button>
+          <button className="btn" onClick={() => navigate('/cart')}>Cart</button>
           {!user ? (
             <button className="btn" onClick={() => onAccountClick && onAccountClick()}>Account</button>
           ) : (
@@ -48,7 +50,7 @@ const Navbar = ({ onNavigate, onSearch, user, onAccountClick, onLogout }) => {
               <button className="btn" onClick={() => onLogout && onLogout()}>Logout</button>
             </>
           )}
-          <button className="btn" onClick={() => onNavigate && onNavigate('wishlist')}>Wishlist</button>
+          <button className="btn" onClick={() => navigate('/wishlist')}>Wishlist</button>
         </div>
       </div>
 

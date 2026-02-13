@@ -1,18 +1,83 @@
 import { useEffect, useState } from 'react';
-import { getProducts, createProduct, updateProduct, deleteProduct } from '../api';
+import { getProducts, createProduct, updateProduct, deleteProduct } from '../../api';
 
 function ProductForm({ initial = {}, onSave, onCancel }) {
   const [form, setForm] = useState({ name: '', description: '', price: '', quantity: 0, image_url: '', ...initial });
-  useEffect(() => setForm({ name: '', description: '', price: '', quantity: 0, image_url: '', ...initial }), [initial]);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(initial.image_url || '');
+
+  useEffect(() => {
+    setForm({ name: '', description: '', price: '', quantity: 0, image_url: '', ...initial });
+    setImagePreview(initial.image_url || '');
+    setImageFile(null);
+  }, [initial]);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async () => {
+    let finalForm = { ...form };
+
+    // If there's a new image file, upload it first
+    if (imageFile) {
+      const formData = new FormData();
+      formData.append('image', imageFile);
+
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('http://localhost:4000/api/upload', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          finalForm.image_url = `http://localhost:4000${data.imageUrl}`;
+        } else {
+          alert('Failed to upload image');
+          return;
+        }
+      } catch (err) {
+        alert('Error uploading image: ' + err.message);
+        return;
+      }
+    }
+
+    onSave(finalForm);
+  };
+
   return (
     <div className="product-form">
       <input placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-      <input placeholder="Image URL" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
+
+      <div className="image-upload-section">
+        <label htmlFor="image-upload" className="image-upload-label">
+          {imagePreview ? (
+            <img src={imagePreview} alt="Preview" className="image-preview" />
+          ) : (
+            <div className="image-placeholder">Click to upload image</div>
+          )}
+        </label>
+        <input
+          id="image-upload"
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          style={{ display: 'none' }}
+        />
+      </div>
+
       <textarea placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
       <input type="number" placeholder="Price" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
       <input type="number" placeholder="Quantity" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
       <div>
-        <button className="btn primary" onClick={() => onSave(form)}>Save</button>
+        <button className="btn primary" onClick={handleSubmit}>Save</button>
         <button className="btn" onClick={onCancel}>Cancel</button>
       </div>
     </div>
