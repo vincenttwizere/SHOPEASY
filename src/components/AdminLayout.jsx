@@ -33,8 +33,7 @@ export default function AdminLayout({ onLogout, user }) {
                 {/* Logo */}
                 <div className="sidebar-header">
                     <div className="logo-modern">
-                        <div className="logo-icon">S</div>
-                        {!collapsed && <span className="logo-text">ShopEasy</span>}
+                        {!collapsed && <span className="logo-text">SHOPEASY</span>}
                     </div>
                     <button className="collapse-btn" onClick={() => setCollapsed(!collapsed)}>
                         {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
@@ -45,7 +44,6 @@ export default function AdminLayout({ onLogout, user }) {
                 <nav className="sidebar-nav-modern">
                     {/* Menu Section */}
                     <div className="nav-section">
-                        {!collapsed && <div className="section-label">Menu</div>}
                         <NavLink to="/admin" end className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
                             <LayoutDashboard size={20} />
                             {!collapsed && <span>Dashboard</span>}
@@ -101,16 +99,13 @@ export default function AdminLayout({ onLogout, user }) {
                             <HelpCircle size={20} />
                             {!collapsed && <span>Get Help</span>}
                         </NavLink>
+
+                        <button className="nav-item logout-btn" onClick={handleLogout} style={{ marginTop: 'auto', color: '#ef4444' }}>
+                            <LogOut size={20} />
+                            {!collapsed && <span>Logout</span>}
+                        </button>
                     </div>
                 </nav>
-
-                {/* Logout */}
-                <div className="sidebar-footer">
-                    <button className="nav-item logout-btn" onClick={handleLogout}>
-                        <LogOut size={20} />
-                        {!collapsed && <span>Logout</span>}
-                    </button>
-                </div>
             </aside>
 
             {/* Main Content */}

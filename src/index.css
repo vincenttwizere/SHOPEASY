@@ -2330,26 +2330,16 @@ tbody td {
 .logo-modern {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.logo-icon {
-  width: 36px;
-  height: 36px;
-  background: #ff6600;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  color: white;
-  font-weight: 700;
-  font-size: 18px;
+  width: 100%;
 }
 
 .logo-text {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-size: 20px;
+  font-weight: 800;
+  color: #ff6600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .collapse-btn {
