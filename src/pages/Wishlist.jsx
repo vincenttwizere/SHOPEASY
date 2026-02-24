@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getProducts, getWishlist, removeFromWishlist } from '../api';
+import { getWishlist, removeFromWishlist } from '../api';
 
 export default function Wishlist({ onViewDetails }) {
   const [items, setItems] = useState([]);
@@ -8,11 +8,11 @@ export default function Wishlist({ onViewDetails }) {
   async function load() {
     setLoading(true);
     try {
-      const allProducts = await getProducts();
-      const wishlistIds = getWishlist();
-      const filtered = allProducts.filter(p => wishlistIds.includes(p.id));
-      setItems(filtered.map(p => ({
-        id: p.id,
+      // API now returns array of objects { product_id, name, price, image_url, description }
+      const wishlistItems = await getWishlist();
+      setItems(wishlistItems.map(p => ({
+        id: p.product_id, // Note: backend returns product_id joined from wishlists table? 
+        // Let's check controller: SELECT w.product_id, p.name...
         name: p.name,
         price: p.price,
         image: p.image_url || p.image || '',
@@ -26,8 +26,8 @@ export default function Wishlist({ onViewDetails }) {
 
   useEffect(() => { load(); }, []);
 
-  function handleRemove(productId) {
-    removeFromWishlist(productId);
+  async function handleRemove(productId) {
+    await removeFromWishlist(productId);
     load();
   }
 

@@ -56,3 +56,23 @@ CREATE TABLE IF NOT EXISTS order_items (
   FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
   FOREIGN KEY (product_id) REFERENCES products(id)
 );
+
+-- Add new columns to products if they don't exist
+-- Note: In a real migration we would verify existence first, but for this setup we'll assume we can alter or the table is recreated.
+-- However, since this is a schema definition file, we update the table definition.
+
+-- If you are running this on an existing DB, you might need ALTER statements. 
+-- For the purpose of this file which is likely used for initialization:
+
+ALTER TABLE products ADD COLUMN IF NOT EXISTS original_price DECIMAL(10,2);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS images JSON;
+
+CREATE TABLE IF NOT EXISTS wishlists (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  product_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_wishlist (user_id, product_id)
+);

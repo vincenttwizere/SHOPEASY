@@ -35,6 +35,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/wishlist', require('./routes/wishlists'));
 
 app.use(errorHandler);
 

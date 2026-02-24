@@ -18,7 +18,7 @@ import AdminProducts from './pages/admin/AdminProducts'
 import AdminOrders from './pages/admin/AdminOrders'
 import AdminUsers from './pages/admin/AdminUsers'
 import { RequireAuth, RequireAdmin } from './components/ProtectedRoute'
-import { addToCart as apiAddToCart, placeOrder, addToWishlist, removeFromWishlist, isInWishlist } from './api'
+import { addToCart as apiAddToCart, placeOrder } from './api'
 import AdminMessages from './pages/admin/AdminMessages'
 import AdminAnalytics from './pages/admin/AdminAnalytics'
 import AdminInvoice from './pages/admin/AdminInvoice'
@@ -131,13 +131,7 @@ const App = () => {
     }
   }
 
-  const handleWishlistToggle = (productId) => {
-    if (isInWishlist(productId)) {
-      removeFromWishlist(productId);
-    } else {
-      addToWishlist(productId);
-    }
-  };
+
 
   async function handlePlaceOrder() {
     if (!user) return setAuthOpen(true);
@@ -168,11 +162,8 @@ const App = () => {
         <Route path="/details" element={
           selectedProduct ? (
             <Details
-              product={selectedProduct}
-              onAddToCart={handleAddToCart}
-              onBuyNow={handleBuyNow}
-              onWishlistToggle={handleWishlistToggle}
-              isInWishlist={isInWishlist}
+            // Product is passed via state usually, but fallback to selectedProduct prop if needed
+            // The new Details component uses useParams and fetches its own data
             />
           ) : <div>Product not found</div>
         } />

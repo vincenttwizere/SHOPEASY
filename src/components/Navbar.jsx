@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Menu, X } from "lucide-react";
+import { Search, Menu, X, ShoppingCart, Heart, User } from "lucide-react";
 
 const Navbar = ({ onSearch, user, onAccountClick, onLogout }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -37,20 +37,32 @@ const Navbar = ({ onSearch, user, onAccountClick, onLogout }) => {
       <div className="search-bar">
         <div className="search-box">
           <input value={query} onChange={(e) => setQuery(e.target.value)} type="text" placeholder="Search products..." />
-          <button className="btn primary" onClick={() => onSearch && onSearch(query)}>Search</button>
+          <button className="btn primary" onClick={() => onSearch && onSearch(query)}> <Search size={18} /> </button>
         </div>
 
         <div className="search-actions">
-          <button className="btn" onClick={() => navigate('/cart')}>Cart</button>
           {!user ? (
-            <button className="btn" onClick={() => onAccountClick && onAccountClick()}>Account</button>
+            <button className="btn" onClick={() => onAccountClick && onAccountClick()} title="Login / Register">
+              <User size={20} style={{ marginRight: 6 }} /> Account
+            </button>
           ) : (
-            <>
-              <button className="btn">{user.name || 'Account'}</button>
-              <button className="btn" onClick={() => onLogout && onLogout()}>Logout</button>
-            </>
+            <div className="account-dropdown">
+              <button className="btn" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <User size={20} />
+                {user.name || 'Account'}
+              </button>
+              {/* Simple logout trigger for now, could be a dropdown later */}
+              <button className="btn logout-btn" onClick={() => onLogout && onLogout()} style={{ marginLeft: 4, fontSize: 12 }}>Logout</button>
+            </div>
           )}
-          <button className="btn" onClick={() => navigate('/wishlist')}>Wishlist</button>
+
+          <button className="btn icon-only" onClick={() => navigate('/wishlist')} title="Wishlist">
+            <Heart size={20} />
+          </button>
+
+          <button className="btn icon-only" onClick={() => navigate('/cart')} title="Cart">
+            <ShoppingCart size={20} />
+          </button>
         </div>
       </div>
 
