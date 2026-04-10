@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getProducts, createProduct, updateProduct, deleteProduct } from '../../api';
+import { getProducts, createProduct, updateProduct, deleteProduct, BASE_URL } from '../../api';
 import { Search, Filter, Plus, Edit2, Trash2, X } from 'lucide-react';
 
 function ProductForm({ initial = {}, onSave, onCancel }) {
@@ -38,7 +38,7 @@ function ProductForm({ initial = {}, onSave, onCancel }) {
 
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:4000/api/upload', {
+        const res = await fetch(`${BASE_URL}/api/upload`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData
@@ -46,7 +46,7 @@ function ProductForm({ initial = {}, onSave, onCancel }) {
 
         if (res.ok) {
           const data = await res.json();
-          finalForm.image_url = `http://localhost:4000${data.imageUrl}`;
+          finalForm.image_url = `${BASE_URL}${data.imageUrl}`;
         } else {
           alert('Failed to upload image');
           return;

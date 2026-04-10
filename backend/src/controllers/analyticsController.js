@@ -65,12 +65,17 @@ exports.getProductPerformance = async (req, res) => {
 };
 
 // Get revenue breakdown by category
-// NOTE: Products table doesn't have category column, returning empty array for now
 exports.getRevenueByCategory = async (req, res) => {
   try {
-    // Since products table doesn't have a category column, return empty data
-    // TODO: Add category column to products table or remove this endpoint
-    res.json([]);
+    const [rows] = await db.query(`
+      SELECT 
+        p.category,
+        COALESCE(SUM(oi.quantity * oi.unit_price), 0) as revenue
+      FROM products p
+      LEFT JOIN order_items oi ON p.id = oi.product_id
+      GROUP BY p.category
+    `);
+    res.json(rows);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

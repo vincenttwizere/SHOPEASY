@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BASE_URL } from '../../api';
 
 export default function AdminOrders() {
     const [orders, setOrders] = useState([]);
@@ -11,7 +12,7 @@ export default function AdminOrders() {
     async function fetchOrders() {
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:4000/api/orders/admin/all', {
+            const res = await fetch(`${BASE_URL}/api/orders/admin/all`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (res.ok) {
@@ -28,7 +29,7 @@ export default function AdminOrders() {
     async function updateStatus(orderId, newStatus) {
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`http://localhost:4000/api/orders/admin/${orderId}/status`, {
+            const res = await fetch(`${BASE_URL}/api/orders/admin/${orderId}/status`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

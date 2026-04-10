@@ -9,6 +9,8 @@ export default function Products({ onViewDetails, items: propItems, searchQuery 
   const [items, setItems] = useState(propItems || products);
   const [loading, setLoading] = useState(false);
   const [wishlist, setWishlist] = useState([]);
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -103,6 +105,22 @@ export default function Products({ onViewDetails, items: propItems, searchQuery 
     }
   };
 
+  // compute categories for filter
+  const categories = Array.from(new Set(items.map(p => p.category).filter(Boolean)));
+
+  // apply front-end filters and sorting
+  let displayed = [...items];
+  if (categoryFilter !== 'all') {
+    displayed = displayed.filter(p => p.category === categoryFilter);
+  }
+  if (sortOrder === 'priceAsc') {
+    displayed.sort((a, b) => a.price - b.price);
+  } else if (sortOrder === 'priceDesc') {
+    displayed.sort((a, b) => b.price - a.price);
+  } else if (sortOrder === 'newest') {
+    // assuming items have id order roughly state, else nothing
+  }
+
   return (
     <div className="products-page">
       <div className="products-header">
@@ -112,18 +130,18 @@ export default function Products({ onViewDetails, items: propItems, searchQuery 
       </div>
 
       <div className="products-filters">
-        <select>
-          <option>All Categories</option>
-          <option>Electronics</option>
-          <option>Fashion</option>
-          <option>Accessories</option>
+        <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+          <option value="all">All Categories</option>
+          {categories.map(cat => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
         </select>
 
-        <select>
-          <option>Sort By</option>
-          <option>Price: Low to High</option>
-          <option>Price: High to Low</option>
-          <option>Newest</option>
+        <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
+          <option value="">Sort By</option>
+          <option value="priceAsc">Price: Low to High</option>
+          <option value="priceDesc">Price: High to Low</option>
+          <option value="newest">Newest</option>
         </select>
       </div>
 

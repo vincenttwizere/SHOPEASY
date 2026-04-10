@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BASE_URL } from '../../api';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, Users, ShoppingBag, DollarSign, Download, Calendar } from 'lucide-react';
 
@@ -22,12 +23,12 @@ export default function AdminAnalytics() {
             const headers = { Authorization: `Bearer ${token}` };
 
             // Fetch stats
-            const statsRes = await fetch('http://localhost:4000/api/orders/admin/stats', { headers });
+            const statsRes = await fetch(`${BASE_URL}/api/orders/admin/stats`, { headers });
             const statsData = await statsRes.json();
             setStats(statsData);
 
             // Fetch trends
-            const trendsRes = await fetch('http://localhost:4000/api/analytics/sales-trends', { headers });
+            const trendsRes = await fetch(`${BASE_URL}/api/analytics/sales-trends`, { headers });
             const trendsData = await trendsRes.json();
             setRevenueData(trendsData);
 

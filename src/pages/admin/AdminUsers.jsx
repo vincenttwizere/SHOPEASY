@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BASE_URL } from '../../api';
 
 export default function AdminUsers() {
     const [users, setUsers] = useState([]);
@@ -11,7 +12,7 @@ export default function AdminUsers() {
     async function fetchUsers() {
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:4000/api/users', {
+            const res = await fetch(`${BASE_URL}/api/users`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (res.ok) {

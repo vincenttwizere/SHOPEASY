@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BASE_URL } from '../../api';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, Package, ShoppingCart, DollarSign, AlertTriangle } from 'lucide-react';
 
@@ -25,13 +26,21 @@ export default function AdminDashboard() {
         try {
             // Fetch all analytics data in parallel
             const [statsRes, trendsRes, topProdRes, revCatRes, lowStockRes, recentRes] = await Promise.all([
-                fetch('http://localhost:4000/api/orders/admin/stats', { headers }),
-                fetch('http://localhost:4000/api/analytics/sales-trends', { headers }),
-                fetch('http://localhost:4000/api/analytics/top-products', { headers }),
-                fetch('http://localhost:4000/api/analytics/revenue-by-category', { headers }),
-                fetch('http://localhost:4000/api/analytics/low-stock', { headers }),
-                fetch('http://localhost:4000/api/analytics/recent-orders', { headers })
+                fetch(`${BASE_URL}/api/orders/admin/stats`, { headers }),
+                fetch(`${BASE_URL}/api/analytics/sales-trends`, { headers }),
+                fetch(`${BASE_URL}/api/analytics/top-products`, { headers }),
+                fetch(`${BASE_URL}/api/analytics/revenue-by-category`, { headers }),
+                fetch(`${BASE_URL}/api/analytics/low-stock`, { headers }),
+                fetch(`${BASE_URL}/api/analytics/recent-orders`, { headers })
             ]);
+
+            // Check if all responses are OK
+            if (!statsRes.ok) throw new Error(`Failed to fetch stats: ${statsRes.statusText}`);
+            if (!trendsRes.ok) throw new Error(`Failed to fetch sales trends: ${trendsRes.statusText}`);
+            if (!topProdRes.ok) throw new Error(`Failed to fetch top products: ${topProdRes.statusText}`);
+            if (!revCatRes.ok) throw new Error(`Failed to fetch revenue by category: ${revCatRes.statusText}`);
+            if (!lowStockRes.ok) throw new Error(`Failed to fetch low stock: ${lowStockRes.statusText}`);
+            if (!recentRes.ok) throw new Error(`Failed to fetch recent orders: ${recentRes.statusText}`);
 
             const [statsData, trendsData, topProdData, revCatData, lowStockData, recentData] = await Promise.all([
                 statsRes.json(),
@@ -42,12 +51,13 @@ export default function AdminDashboard() {
                 recentRes.json()
             ]);
 
-            setStats(statsData);
-            setSalesTrends(trendsData);
-            setTopProducts(topProdData);
-            setRevenueByCategory(revCatData);
-            setLowStock(lowStockData);
-            setRecentOrders(recentData);
+            // Validate data is in correct format
+            setStats(statsData || {});
+            setSalesTrends(Array.isArray(trendsData) ? trendsData : []);
+            setTopProducts(Array.isArray(topProdData) ? topProdData : []);
+            setRevenueByCategory(Array.isArray(revCatData) ? revCatData : []);
+            setLowStock(Array.isArray(lowStockData) ? lowStockData : []);
+            setRecentOrders(Array.isArray(recentData) ? recentData : []);
         } catch (err) {
             console.error('Error fetching dashboard data:', err);
             setError(err.message || 'Failed to load dashboard data. Please try again.');

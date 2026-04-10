@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BASE_URL } from '../../api';
 import { FileText, Download, Send, Printer, Eye } from 'lucide-react';
 
 export default function AdminInvoice() {
@@ -16,7 +17,7 @@ export default function AdminInvoice() {
             const headers = { Authorization: `Bearer ${token}` };
 
             // Fetch orders
-            const ordersRes = await fetch('http://localhost:4000/api/orders/admin/all', { headers });
+            const ordersRes = await fetch(`${BASE_URL}/api/orders/admin/all`, { headers });
             if (ordersRes.ok) {
                 const ordersData = await ordersRes.json();
                 setOrders(ordersData);

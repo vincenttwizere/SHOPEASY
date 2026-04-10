@@ -100,7 +100,12 @@ const App = () => {
       navigate('/admin');
     } else {
       // Redirect to previous page or home
-      const from = location.state?.from || '/';
+      let from = '/';
+      if (location.state?.from) {
+        // location.state.from may be an object or string
+        if (typeof location.state.from === 'string') from = location.state.from;
+        else if (location.state.from.pathname) from = location.state.from.pathname + (location.state.from.search || '');
+      }
       navigate(from);
     }
   };

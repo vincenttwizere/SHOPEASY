@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 const parseJwt = (token) => {
     if (!token) return null;
@@ -13,11 +13,13 @@ const parseJwt = (token) => {
 };
 
 export function RequireAuth({ children }) {
+    const location = useLocation();
     const token = localStorage.getItem('token');
     const user = parseJwt(token);
 
     if (!user) {
-        return <Navigate to="/" replace />;
+        // save the location user was trying to access so we can redirect after login
+        return <Navigate to="/" replace state={{ from: location }} />;
     }
 
     return children;

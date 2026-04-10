@@ -21,6 +21,25 @@ async function setup() {
         connection = await mysql.createConnection(connConfig);
         console.log('Connected! Running schema...');
         await connection.query(schema);
+        console.log('Schema applied. Ensuring product table has new columns...');
+        // attempt to add missing columns (ignores errors if they already exist)
+        const alterQueries = [
+            "ALTER TABLE products ADD COLUMN IF NOT EXISTS category VARCHAR(255) DEFAULT ''",
+            "ALTER TABLE products ADD COLUMN IF NOT EXISTS original_price DECIMAL(10,2) DEFAULT NULL",
+            "ALTER TABLE products ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE",
+            "ALTER TABLE products ADD COLUMN IF NOT EXISTS images JSON",
+            "ALTER TABLE products ADD COLUMN IF NOT EXISTS features JSON"
+        ];
+        for (const q of alterQueries) {
+            try {
+                await connection.query(q);
+            } catch (e) {
+                // some MySQL versions may not support IF NOT EXISTS; ignore duplicate errors
+                if (e && e.code !== 'ER_DUP_FIELDNAME') {
+                    console.warn('Alter table warning', e.message);
+                }
+            }
+        }
         console.log('Database initialized successfully!');
     } catch (err) {
         if (err && err.code === 'ER_ACCESS_DENIED_ERROR') {
