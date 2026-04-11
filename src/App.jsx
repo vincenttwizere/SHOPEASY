@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from "./components/Navbar"
 import Discover from "./components/Discover"
@@ -18,7 +17,6 @@ import AdminProducts from './pages/admin/AdminProducts'
 import AdminOrders from './pages/admin/AdminOrders'
 import AdminUsers from './pages/admin/AdminUsers'
 import { RequireAuth, RequireAdmin } from './components/ProtectedRoute'
-import { addToCart as apiAddToCart, placeOrder } from './api'
 import AdminMessages from './pages/admin/AdminMessages'
 import AdminAnalytics from './pages/admin/AdminAnalytics'
 import AdminInvoice from './pages/admin/AdminInvoice'
@@ -26,20 +24,9 @@ import AdminDiscounts from './pages/admin/AdminDiscounts'
 import AdminSettings from './pages/admin/AdminSettings'
 import AdminSecurity from './pages/admin/AdminSecurity'
 import AdminHelp from './pages/admin/AdminHelp'
+import { AuthProvider, useAuth } from './context/AuthContext'
 
-const parseJwt = (token) => {
-  if (!token) return null;
-  try {
-    const parts = token.split('.');
-    if (parts.length < 2) return null;
-    const payload = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
-    return JSON.parse(payload);
-  } catch {
-    return null;
-  }
-};
-
-function HomePage({ onViewDetails }) {
+function HomePage() {
   return (
     <div>
       <p className="passage">Free shipping on orders over $50 | Same-day delivery available</p>
@@ -62,39 +49,23 @@ function HomePage({ onViewDetails }) {
         <Card title="Beauty & Health" description="Skincare, makeup, and health products for everyone." icon="Beauty & Health" />
       </div>
 
-      <Products onViewDetails={onViewDetails} />
+      <Products />
       <Categories />
     </div>
   );
 }
 
-const App = () => {
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [authOpen, setAuthOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
+function AppContent() {
+  const { user, authModalOpen, login, logout, closeAuthModal } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    // Initialize user from token
-    const token = localStorage.getItem('token');
-    if (token) {
-      const payload = parseJwt(token);
-      setUser(payload);
-    }
-  }, []);
-
   const handleViewDetails = (product) => {
-    setSelectedProduct(product);
-    navigate('/details');
+    navigate(`/details/${product.id}`);
   };
 
-  const handleOpenAuth = () => setAuthOpen(true);
-  const handleCloseAuth = () => setAuthOpen(false);
-
   const handleLogin = (u) => {
-    setUser(u);
+    login(u);
     // Role-based redirect
     if (u.role === 'admin') {
       navigate('/admin');
@@ -102,7 +73,6 @@ const App = () => {
       // Redirect to previous page or home
       let from = '/';
       if (location.state?.from) {
-        // location.state.from may be an object or string
         if (typeof location.state.from === 'string') from = location.state.from;
         else if (location.state.from.pathname) from = location.state.from.pathname + (location.state.from.search || '');
       }
@@ -110,74 +80,39 @@ const App = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    navigate('/');
-  };
-
-  async function handleAddToCart(product, quantity = 1) {
-    if (!user) return setAuthOpen(true);
-    try {
-      await apiAddToCart({ productId: product.id, quantity });
-      alert('Added to cart');
-    } catch (err) {
-      alert(err.message || 'Failed to add to cart');
-    }
-  }
-
-  async function handleBuyNow(product, quantity = 1) {
-    if (!user) return setAuthOpen(true);
-    try {
-      await apiAddToCart({ productId: product.id, quantity });
-      navigate('/cart');
-    } catch (err) {
-      alert(err.message || 'Failed to process buy now');
-    }
-  }
-
-
-
-  async function handlePlaceOrder() {
-    if (!user) return setAuthOpen(true);
-    try {
-      const res = await placeOrder();
-      alert(`Order ${res.orderId} placed — total $${res.total}`);
-      navigate('/');
-    } catch (err) {
-      alert(err.message || 'Checkout failed');
-    }
-  }
-
   const handleSearch = (q) => {
-    setSearchQuery(q || '');
-    navigate('/products');
+    if (q) {
+      navigate(`/products?q=${encodeURIComponent(q)}`);
+    } else {
+      navigate('/products');
+    }
   };
+
+  // Get search query from URL params
+  const searchParams = new URLSearchParams(location.search);
+  const searchQuery = searchParams.get('q') || '';
 
   return (
     <div>
       {/* Show Navbar and Footer only for non-admin routes */}
       {!location.pathname.startsWith('/admin') && (
-        <Navbar onSearch={handleSearch} onAccountClick={handleOpenAuth} user={user} onLogout={handleLogout} />
+        <Navbar onSearch={handleSearch} onAccountClick={() => {}} user={user} onLogout={logout} />
       )}
 
       <Routes>
         <Route path="/" element={<HomePage onViewDetails={handleViewDetails} />} />
         <Route path="/products" element={<Products onViewDetails={handleViewDetails} searchQuery={searchQuery} />} />
-        <Route path="/details" element={
-          selectedProduct ? (
-            <Details
-            // Product is passed via state usually, but fallback to selectedProduct prop if needed
-            // The new Details component uses useParams and fetches its own data
-            />
-          ) : <div>Product not found</div>
-        } />
+        <Route path="/details/:id" element={<Details />} />
         <Route path="/cart" element={
           <RequireAuth>
-            <Cart onPlaceOrder={handlePlaceOrder} />
+            <Cart />
           </RequireAuth>
         } />
-        <Route path="/wishlist" element={<Wishlist onViewDetails={handleViewDetails} />} />
+        <Route path="/wishlist" element={
+          <RequireAuth>
+            <Wishlist onViewDetails={handleViewDetails} />
+          </RequireAuth>
+        } />
         <Route path="/categories" element={<Categories />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
@@ -185,7 +120,7 @@ const App = () => {
         {/* Admin Routes */}
         <Route path="/admin" element={
           <RequireAdmin>
-            <AdminLayout onLogout={handleLogout} user={user} />
+            <AdminLayout onLogout={logout} user={user} />
           </RequireAdmin>
         }>
           <Route index element={<AdminDashboard />} />
@@ -204,9 +139,17 @@ const App = () => {
 
       {!location.pathname.startsWith('/admin') && <Footer />}
 
-      {authOpen && <AuthModal onClose={handleCloseAuth} onLogin={(u) => { handleLogin(u); handleCloseAuth(); }} />}
+      {authModalOpen && <AuthModal onClose={closeAuthModal} onLogin={handleLogin} />}
     </div>
   )
+}
+
+const App = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
 }
 
 export default App;

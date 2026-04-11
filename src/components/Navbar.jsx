@@ -1,12 +1,38 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, Menu, X, ShoppingCart, Heart, User } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = ({ onSearch, user, onAccountClick, onLogout }) => {
+  const { openAuthModal } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
+
+  const handleAccountClick = () => {
+    if (user) {
+      onAccountClick && onAccountClick();
+    } else {
+      openAuthModal();
+    }
+  };
+
+  const handleWishlistClick = () => {
+    if (!user) {
+      openAuthModal();
+    } else {
+      navigate('/wishlist');
+    }
+  };
+
+  const handleCartClick = () => {
+    if (!user) {
+      openAuthModal();
+    } else {
+      navigate('/cart');
+    }
+  };
 
   return (
     <div className="navbar">
@@ -42,7 +68,7 @@ const Navbar = ({ onSearch, user, onAccountClick, onLogout }) => {
 
         <div className="search-actions">
           {!user ? (
-            <button className="btn" onClick={() => onAccountClick && onAccountClick()} title="Login / Register">
+            <button className="btn" onClick={handleAccountClick} title="Login / Register">
               <User size={20} style={{ marginRight: 6 }} /> Account
             </button>
           ) : (
@@ -56,11 +82,11 @@ const Navbar = ({ onSearch, user, onAccountClick, onLogout }) => {
             </div>
           )}
 
-          <button className="btn icon-only" onClick={() => navigate('/wishlist')} title="Wishlist">
+          <button className="btn icon-only" onClick={handleWishlistClick} title="Wishlist">
             <Heart size={20} />
           </button>
 
-          <button className="btn icon-only" onClick={() => navigate('/cart')} title="Cart">
+          <button className="btn icon-only" onClick={handleCartClick} title="Cart">
             <ShoppingCart size={20} />
           </button>
         </div>

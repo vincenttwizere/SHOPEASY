@@ -25,7 +25,7 @@ async function request(path, opts = {}) {
           message = bodyText;
         }
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
     const err = new Error(message || 'API Error');

@@ -2,16 +2,17 @@ import { useEffect, useState } from "react";
 import { getProducts, getWishlist, addToWishlist, removeFromWishlist, addToCart } from "../api";
 import ProductsCard from "../components/ProductsCard";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-export const products = [];
-
-export default function Products({ onViewDetails, items: propItems, searchQuery }) {
-  const [items, setItems] = useState(propItems || products);
+export default function Products({ items: propItems, searchQuery }) {
+  const [items, setItems] = useState(propItems || []);
   const [loading, setLoading] = useState(false);
   const [wishlist, setWishlist] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState('');
+  const [cartMessage, setCartMessage] = useState('');
   const navigate = useNavigate();
+  const { openAuthModal } = useAuth();
 
   useEffect(() => {
     let mounted = true;
@@ -38,7 +39,7 @@ export default function Products({ onViewDetails, items: propItems, searchQuery 
         }));
 
         if (mounted) {
-          if (!propItems) setItems(mapped);
+          setItems(mapped);
           if (Array.isArray(wishlistData)) {
             setWishlist(wishlistData.map(w => w.product_id));
           }
@@ -56,7 +57,7 @@ export default function Products({ onViewDetails, items: propItems, searchQuery 
   const toggleWishlist = async (productId) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      alert("Please login to use wishlist");
+      openAuthModal();
       return;
     }
 
@@ -78,12 +79,13 @@ export default function Products({ onViewDetails, items: propItems, searchQuery 
   const handleAddToCart = async (product) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      alert("Please login to add to cart");
+      openAuthModal();
       return;
     }
     try {
       await addToCart({ productId: product.id, quantity: 1 });
-      alert("Added to cart!");
+      setCartMessage(`"${product.name}" added to cart!`);
+      setTimeout(() => setCartMessage(''), 3000);
     } catch (err) {
       console.error(err);
       alert("Failed to add to cart");
@@ -93,7 +95,7 @@ export default function Products({ onViewDetails, items: propItems, searchQuery 
   const handleBuyNow = async (product) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      alert("Please login to buy");
+      openAuthModal();
       return;
     }
     try {
@@ -148,7 +150,8 @@ export default function Products({ onViewDetails, items: propItems, searchQuery 
       <div className="products-grid">
         {loading && <p>Loading products...</p>}
         {!loading && items.length === 0 && <p>No products found{searchQuery && ` matching "${searchQuery}"`}.</p>}
-        {items.map((product) => (
+        {cartMessage && <div className="cart-message">{cartMessage}</div>}
+        {displayed.map((product) => (
           <ProductsCard
             key={product.id}
             {...product}
