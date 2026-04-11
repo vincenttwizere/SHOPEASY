@@ -1,4 +1,6 @@
 const db = require('../config/db');
+const { sendPaymentInstructions, sendOrderConfirmation } = require('../services/emailService');
+const { sendPaymentSMS, sendOrderConfirmationSMS } = require('../services/smsService');
 
 // Get Stripe instance lazily - only loads when first needed
 function getStripe() {
@@ -425,13 +427,43 @@ async function processRwandanPayment(req, res, next) {
         method
       });
 
+      // Send notifications (after commit to ensure order is saved)
+      // Prepare payment details for email
+      const paymentDetailsForEmail = {
+        bankName: method === 'bank' ? bankName : null,
+        accountNumber: method === 'bank' ? accountNumber : null,
+        phoneNumber: method === 'phone' ? phoneNumber : null,
+        provider: method === 'mobilemoney' ? provider : null,
+        code: method === 'mobilemoney' ? mobileMoneyCode : null
+      };
+
+      // Send email notification
+      console.log('Sending email notification to:', email);
+      const emailResult = await sendPaymentInstructions(
+        email,
+        fullName,
+        method,
+        referenceCode,
+        finalTotal,
+        paymentDetailsForEmail
+      );
+
+      // Send SMS notification (if phone number available)
+      if (phoneNumber && method === 'phone') {
+        console.log('Sending SMS notification to:', phoneNumber);
+        const smsResult = await sendPaymentSMS(phoneNumber, method, referenceCode, finalTotal);
+      } else if (method === 'mobilemoney') {
+        console.log('Sending SMS notification to:', phoneNumber);
+        const smsResult = await sendPaymentSMS(phoneNumber, method, referenceCode, finalTotal);
+      }
+
       res.json({
         success: true,
         orderId,
         referenceCode,
         method,
         total: finalTotal,
-        message: 'Order created. Payment instructions will be sent to your email.',
+        message: 'Order created. Payment instructions have been sent to your email.',
         instructions: getPaymentInstructions(method, referenceCode)
       });
     } catch (err) {
