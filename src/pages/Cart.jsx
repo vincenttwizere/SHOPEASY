@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { getCart, updateCartItem, removeCartItem, placeOrder } from '../api';
+import { getCart, updateCartItem, removeCartItem } from '../api';
 import { useNavigate } from 'react-router-dom';
+import RwandanPaymentModal from '../components/RwandanPaymentModal';
 
 export default function Cart() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('info');
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const navigate = useNavigate();
 
   async function load() {
@@ -57,20 +58,17 @@ export default function Cart() {
       return;
     }
 
-    try {
-      setCheckoutLoading(true);
-      const res = await placeOrder();
-      setMessage(`Order ${res.orderId} placed successfully! Total: $${res.total}`);
-      setMessageType('success');
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
-      setItems([]);
-    } catch (err) {
-      setMessage(err.message || 'Checkout failed');
-      setMessageType('error');
-    }
-    finally { setCheckoutLoading(false); }
+    // Open payment modal
+    setPaymentModalOpen(true);
+  }
+
+  function handlePaymentSuccess(orderId) {
+    setMessage(`Order ${orderId} placed successfully!`);
+    setMessageType('success');
+    setItems([]);
+    setTimeout(() => {
+      navigate('/');
+    }, 2000);
   }
 
   const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -198,14 +196,9 @@ export default function Cart() {
               
               <button 
                 className="btn-checkout" 
-                onClick={checkout} 
-                disabled={checkoutLoading}
+                onClick={checkout}
               >
-                {checkoutLoading ? (
-                  <><span className="spinner-mini"></span> Processing...</> 
-                ) : (
-                  '→ Proceed to Checkout'
-                )}
+                → Proceed to Checkout
               </button>
               
               <button 
@@ -218,6 +211,14 @@ export default function Cart() {
           </div>
         </div>
       )}
+
+      <RwandanPaymentModal 
+        isOpen={paymentModalOpen}
+        onClose={() => setPaymentModalOpen(false)}
+        cartTotal={total}
+        shippingCost={total > 50 ? 0 : 10}
+        onPaymentSuccess={handlePaymentSuccess}
+      />
     </div>
   );
 }

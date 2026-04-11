@@ -86,4 +86,22 @@ export async function removeFromWishlist(productId) {
   return request(`/api/wishlist/${productId}`, { method: 'DELETE' });
 }
 
-export default { getProducts, getProduct, register, login, saveToken, clearToken, getCart, addToCart, updateCartItem, removeCartItem, placeOrder, getOrders, getWishlist, addToWishlist, removeFromWishlist };
+// Payment
+export async function createPaymentIntent() {
+  return request('/api/payment/create-intent', { method: 'POST' });
+}
+
+export async function confirmPayment(paymentIntentId) {
+  return request('/api/payment/confirm', { method: 'POST', body: JSON.stringify({ paymentIntentId }) });
+}
+
+export async function getPaymentStatus(paymentIntentId) {
+  return request(`/api/payment/status/${paymentIntentId}`);
+}
+
+// Rwandan Payment System
+export async function processRwandanPayment(paymentData) {
+  return request('/api/payment/rwandan', { method: 'POST', body: JSON.stringify(paymentData) });
+}
+
+export default { getProducts, getProduct, register, login, saveToken, clearToken, getCart, addToCart, updateCartItem, removeCartItem, placeOrder, getOrders, getWishlist, addToWishlist, removeFromWishlist, createPaymentIntent, confirmPayment, getPaymentStatus, processRwandanPayment };

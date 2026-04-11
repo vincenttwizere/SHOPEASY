@@ -9,6 +9,7 @@ const orderRoutes = require('./routes/orders');
 const userRoutes = require('./routes/users');
 const uploadRoutes = require('./routes/upload');
 const analyticsRoutes = require('./routes/analytics');
+const paymentRoutes = require('./routes/payment');
 const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
@@ -21,8 +22,22 @@ app.use((req, res, next) => {
 });
 
 // Enable CORS for configured frontend origin. During local development,
-// if FRONTEND_ORIGIN is not set, allow all origins to help debugging.
-const corsOptions = config.FRONTEND_ORIGIN ? { origin: config.FRONTEND_ORIGIN } : { origin: true };
+// accept any localhost port to support Vite's dynamic port allocation.
+let corsOptions;
+if (process.env.NODE_ENV === 'production') {
+  corsOptions = { origin: config.FRONTEND_ORIGIN };
+} else {
+  corsOptions = {
+    origin: (origin, callback) => {
+      // Allow localhost with any port for development
+      if (!origin || /^http:\/\/localhost(:\d+)?$/.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('CORS not allowed'));
+      }
+    }
+  };
+}
 app.use(cors(corsOptions));
 
 // Serve uploaded images statically
@@ -36,6 +51,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/wishlist', require('./routes/wishlists'));
+app.use('/api/payment', paymentRoutes);
 
 app.use(errorHandler);
 

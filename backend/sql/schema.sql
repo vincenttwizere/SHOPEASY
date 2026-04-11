@@ -48,8 +48,14 @@ CREATE TABLE IF NOT EXISTS orders (
   user_id INT NOT NULL,
   total DECIMAL(10,2) NOT NULL,
   status VARCHAR(50) NOT NULL DEFAULT 'pending',
+  payment_id VARCHAR(255),
+  payment_method VARCHAR(50) DEFAULT 'stripe',
+  payment_reference VARCHAR(255),
+  payment_details JSON,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  INDEX idx_payment_reference (payment_reference),
+  INDEX idx_payment_method (payment_method)
 );
 
 CREATE TABLE IF NOT EXISTS order_items (

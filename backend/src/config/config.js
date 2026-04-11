@@ -22,7 +22,9 @@ module.exports = {
   DB_NAME: process.env.DB_NAME || 'shopeasy',
   JWT_SECRET: process.env.JWT_SECRET || 'change_this',
   PORT: process.env.PORT || 4000,
-  FRONTEND_ORIGIN: process.env.FRONTEND_ORIGIN || 'http://localhost:5173'
+  FRONTEND_ORIGIN: process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
+  STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY || ''
 };
 
 // Helpful diagnostic: show which DB user and host were loaded (masking password)
