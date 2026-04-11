@@ -223,7 +223,7 @@ export default function AdminDashboard() {
                                 <tr key={order.id}>
                                     <td>#{order.id}</td>
                                     <td>{order.customer_name}</td>
-                                    <td>${order.total.toFixed(2)}</td>
+                                    <td>${Number(order.total).toFixed(2)}</td>
                                     <td>
                                         <span className={`status-badge ${order.status}`}>{order.status}</span>
                                     </td>

@@ -69,7 +69,7 @@ export default function AdminOrders() {
                                 <td>#{order.id}</td>
                                 <td>{order.user_name}</td>
                                 <td>{order.email}</td>
-                                <td>${order.total.toFixed(2)}</td>
+                                <td>${Number(order.total).toFixed(2)}</td>
                                 <td>
                                     <span className={`status-badge ${order.status}`}>
                                         {order.status}

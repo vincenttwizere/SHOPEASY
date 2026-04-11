@@ -19,12 +19,21 @@ export default function Products({ items: propItems, searchQuery }) {
     async function load() {
       setLoading(true);
       try {
-        // Fetch products and wishlist in parallel
-        // If query fails (e.g. 401 for wishlist), it returns empty array safely
-        const [data, wishlistData] = await Promise.all([
-          getProducts(searchQuery),
-          getWishlist().catch(() => [])
-        ]);
+        const token = localStorage.getItem('token');
+        
+        // Fetch products
+        const data = await getProducts(searchQuery);
+        
+        // Only fetch wishlist if user is authenticated
+        let wishlistData = [];
+        if (token) {
+          try {
+            wishlistData = await getWishlist();
+          } catch {
+            // Silently handle wishlist fetch errors
+            wishlistData = [];
+          }
+        }
 
         const mapped = data.map((p) => ({
           id: p.id,

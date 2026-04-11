@@ -61,31 +61,84 @@ export default function Wishlist({ onViewDetails }) {
 
   return (
     <div className="wishlist-page">
-      <h1>My Wishlist</h1>
-      {loading && <p className="loading">Loading...</p>}
-      {message && <p className={`message ${messageType}`}>{message}</p>}
-      {!loading && items.length === 0 && <p className="empty-wishlist">Your wishlist is empty. <button onClick={() => navigate('/products')}>Start shopping</button></p>}
-      <div className="wishlist-items">
-        {items.map(p => (
-          <div className="wishlist-item" key={p.id}>
-            <img src={p.image} alt={p.name} onClick={() => navigate(`/details/${p.id}`)} />
-            <div className="wishlist-item-content">
-              <h3>{p.name}</h3>
-              <p className="category">{p.category}</p>
-              <p className="price">${Number(p.price).toFixed(2)}</p>
-              <p className="description">{p.description}</p>
-              <div className="wishlist-actions">
-                <button className="btn primary" onClick={() => handleAddToCart(p)}>
-                  <ShoppingCart size={18} /> Add to Cart
-                </button>
-                <button className="btn danger" onClick={() => handleRemove(p.id)}>
-                  <TrashIcon size={18} /> Remove
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="wishlist-header">
+        <h1>My Wishlist</h1>
+        <p className="wishlist-subtitle">{items.length} {items.length === 1 ? 'item' : 'items'}</p>
       </div>
+
+      {loading && (
+        <div className="wishlist-loading">
+          <div className="spinner"></div>
+          <p>Loading your wishlist...</p>
+        </div>
+      )}
+
+      {message && (
+        <div className={`wishlist-message wishlist-message-${messageType}`}>
+          <div className="message-content">
+            {messageType === 'success' && '✓ '}
+            {messageType === 'error' && '✗ '}
+            {message}
+          </div>
+        </div>
+      )}
+
+      {!loading && items.length === 0 ? (
+        <div className="wishlist-empty">
+          <div className="empty-icon">♡</div>
+          <h2>Your wishlist is empty</h2>
+          <p>Save items you love to come back to them later</p>
+          <button className="btn primary" onClick={() => navigate('/products')}>
+            Browse Products
+          </button>
+        </div>
+      ) : (
+        <div className="wishlist-container">
+          <div className="wishlist-items">
+            {items.map(p => (
+              <div className="wishlist-item" key={p.id}>
+                <div className="item-image-wrapper" onClick={() => navigate(`/details/${p.id}`)}>
+                  <img src={p.image} alt={p.name} className="item-image" />
+                  <div className="image-overlay">View Details</div>
+                </div>
+
+                <div className="item-info">
+                  <h3 className="item-name">{p.name}</h3>
+                  
+                  {p.category && (
+                    <p className="item-category">{p.category}</p>
+                  )}
+                  
+                  <p className="item-price">${Number(p.price).toFixed(2)}</p>
+                  
+                  {p.description && (
+                    <p className="item-description">{p.description}</p>
+                  )}
+
+                  <div className="item-actions">
+                    <button 
+                      className="btn-add-to-cart" 
+                      onClick={() => handleAddToCart(p)}
+                      title="Add to cart"
+                    >
+                      <ShoppingCart size={16} /> 
+                      <span>Add to Cart</span>
+                    </button>
+                    
+                    <button 
+                      className="btn-remove-wishlist" 
+                      onClick={() => handleRemove(p.id)}
+                      title="Remove from wishlist"
+                    >
+                      <TrashIcon size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

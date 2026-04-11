@@ -22,10 +22,21 @@ const Details = () => {
     const fetchData = async () => {
       try {
         setError('');
-        const [p, wList] = await Promise.all([
-          getProduct(id),
-          getWishlist().catch(() => [])
-        ]);
+        const token = localStorage.getItem('token');
+        
+        // Fetch product data
+        const p = await getProduct(id);
+        
+        // Only fetch wishlist if user is authenticated
+        let wList = [];
+        if (token) {
+          try {
+            wList = await getWishlist();
+          } catch {
+            // Silently handle wishlist fetch errors
+            wList = [];
+          }
+        }
 
         if (!p) {
           setError('Product not found');

@@ -77,55 +77,145 @@ export default function Cart() {
 
   return (
     <div className="cart-page">
-      <h1>Your Cart</h1>
-      {loading && <p className="loading">Loading...</p>}
-      {message && <p className={`message ${messageType}`}>{message}</p>}
-      
-      <div className="cart-items">
-        {items.length === 0 && !loading && <p className="empty-cart">Your cart is empty</p>}
-        {items.map(it => (
-          <div className="cart-item" key={it.itemId}>
-            <img src={it.image_url || it.image} alt={it.name} />
-            <div className="cart-item-details">
-              <h4>{it.name}</h4>
-              <p className="price">${Number(it.price).toFixed(2)}</p>
-              <div className="quantity-control">
-                <label>Quantity:</label>
-                <input 
-                  type="number" 
-                  min={1} 
-                  value={it.quantity} 
-                  onChange={(e) => changeQty(it.itemId, Number(e.target.value))} 
-                />
-                <span className="item-total">Item Total: ${Number(it.price * it.quantity).toFixed(2)}</span>
-              </div>
-              <button className="btn remove-btn" onClick={() => removeItem(it.itemId)}>Remove</button>
-            </div>
-          </div>
-        ))}
+      <div className="cart-header">
+        <h1>Your Shopping Cart</h1>
+        <p className="cart-subtitle">{items.length} {items.length === 1 ? 'item' : 'items'}</p>
       </div>
 
-      {items.length > 0 && (
-        <div className="cart-summary">
-          <div className="summary-item">
-            <span>Subtotal:</span>
-            <span>${Number(total).toFixed(2)}</span>
+      {loading && (
+        <div className="cart-loading">
+          <div className="spinner"></div>
+          <p>Loading your cart...</p>
+        </div>
+      )}
+
+      {message && (
+        <div className={`cart-message cart-message-${messageType}`}>
+          <div className="message-content">
+            {messageType === 'success' && '✓ '}
+            {messageType === 'error' && '✗ '}
+            {messageType === 'warning' && '⚠ '}
+            {message}
           </div>
-          <div className="summary-item shipping">
-            <span>Shipping:</span>
-            <span>{total > 50 ? 'FREE' : '$10.00'}</span>
-          </div>
-          <div className="summary-item total">
-            <span>Total:</span>
-            <span>${(total + (total > 50 ? 0 : 10)).toFixed(2)}</span>
-          </div>
-          <button 
-            className="btn primary checkout-btn" 
-            onClick={checkout} 
-            disabled={checkoutLoading}
-          >
-            {checkoutLoading ? 'Processing...' : 'Proceed to Checkout'}
+        </div>
+      )}
+      
+      {!loading && items.length === 0 ? (
+        <div className="cart-empty">
+          <div className="empty-icon">🛒</div>
+          <h2>Your cart is empty</h2>
+          <p>Add some items to get started!</p>
+          <button className="btn primary" onClick={() => navigate('/products')}>
+            Continue Shopping
           </button>
+        </div>
+      ) : (
+        <div className="cart-container">
+          <div className="cart-main">
+            <div className="cart-items">
+              {items.map(it => (
+                <div className="cart-item" key={it.itemId}>
+                  <div className="item-image-wrapper">
+                    <img src={it.image_url || it.image} alt={it.name} className="item-image" />
+                  </div>
+                  
+                  <div className="item-details">
+                    <h3 className="item-name">{it.name}</h3>
+                    <p className="item-price">${Number(it.price).toFixed(2)}</p>
+                  </div>
+
+                  <div className="item-quantity">
+                    <label>Qty:</label>
+                    <div className="qty-input-group">
+                      <button 
+                        className="qty-dec"
+                        onClick={() => changeQty(it.itemId, it.quantity - 1)}
+                      >
+                        −
+                      </button>
+                      <input 
+                        type="number" 
+                        min={1} 
+                        value={it.quantity}
+                        className="qty-input"
+                        onChange={(e) => changeQty(it.itemId, Number(e.target.value))} 
+                      />
+                      <button 
+                        className="qty-inc"
+                        onClick={() => changeQty(it.itemId, it.quantity + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="item-total-price">
+                    ${Number(it.price * it.quantity).toFixed(2)}
+                  </div>
+
+                  <button 
+                    className="btn-remove" 
+                    onClick={() => removeItem(it.itemId)}
+                    title="Remove from cart"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="cart-sidebar">
+            <div className="order-summary">
+              <h2>Order Summary</h2>
+              
+              <div className="summary-row">
+                <span>Subtotal</span>
+                <span>${Number(total).toFixed(2)}</span>
+              </div>
+              
+              <div className="summary-row">
+                <span>Shipping</span>
+                <span className="shipping-cost">
+                  {total > 50 ? (
+                    <><span className="badge">FREE</span></>
+                  ) : (
+                    '$10.00'
+                  )}
+                </span>
+              </div>
+              
+              {total > 50 && (
+                <div className="promo-note">✓ Free shipping on orders over $50</div>
+              )}
+              
+              <div className="summary-divider"></div>
+              
+              <div className="summary-row total">
+                <span>Total</span>
+                <span className="total-amount">${(total + (total > 50 ? 0 : 10)).toFixed(2)}</span>
+              </div>
+              
+              <button 
+                className="btn-checkout" 
+                onClick={checkout} 
+                disabled={checkoutLoading}
+              >
+                {checkoutLoading ? (
+                  <><span className="spinner-mini"></span> Processing...</> 
+                ) : (
+                  '→ Proceed to Checkout'
+                )}
+              </button>
+              
+              <button 
+                className="btn-continue-shopping"
+                onClick={() => navigate('/products')}
+              >
+                Continue Shopping
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
