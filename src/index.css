@@ -1391,6 +1391,131 @@
   font-weight: 700;
 }
 
+/* Product Variations (Colors & Sizes) */
+.variations-section {
+  margin-top: 30px;
+  padding: 24px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.variations-section h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 16px;
+}
+
+.color-selector {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.color-option {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.color-option.selected {
+  box-shadow: 0 0 0 3px rgb(255, 102, 0);
+}
+
+.color-label {
+  color: #0f172a;
+}
+
+.size-selector {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.size-option {
+  padding: 10px 16px;
+  border: 2px solid #cbd5e1;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.size-option:hover {
+  border-color: rgb(255, 102, 0);
+  color: rgb(255, 102, 0);
+}
+
+.size-option.selected {
+  background: rgb(255, 102, 0);
+  border-color: rgb(255, 102, 0);
+  color: white;
+}
+
+.selected-option {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Specifications Section */
+.specifications-section {
+  margin-top: 30px;
+  padding: 24px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.specifications-section h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 16px;
+}
+
+.specs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.specs-table tr {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.specs-table tr:last-child {
+  border-bottom: none;
+}
+
+.spec-label {
+  padding: 12px 0;
+  font-weight: 600;
+  color: #0f172a;
+  width: 40%;
+}
+
+.spec-value {
+  padding: 12px 0;
+  padding-left: 20px;
+  color: #64748b;
+}
+
 @media (max-width: 768px) {
   .details-gallery {
     border-right: none;

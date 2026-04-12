@@ -15,6 +15,8 @@ const Details = () => {
   const [quantity, setQuantity] = useState(1);
   const [inWishlist, setInWishlist] = useState(false);
   const [cartFeedback, setCartFeedback] = useState('');
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -48,12 +50,22 @@ const Details = () => {
           image: p.image_url || p.image,
           originalPrice: p.original_price,
           images: p.images ? (typeof p.images === 'string' ? JSON.parse(p.images) : p.images) : [],
-          stock: p.quantity || 0
+          stock: p.quantity || 0,
+          colors: p.colors ? (typeof p.colors === 'string' ? JSON.parse(p.colors) : p.colors) : [],
+          sizes: p.sizes ? (typeof p.sizes === 'string' ? JSON.parse(p.sizes) : p.sizes) : [],
+          specifications: p.specifications ? (typeof p.specifications === 'string' ? JSON.parse(p.specifications) : p.specifications) : {}
         };
 
         if (isMounted) {
           setProduct(mapped);
           setSelectedImage(mapped.image);
+          // Set default selections
+          if (mapped.colors && mapped.colors.length > 0) {
+            setSelectedColor(mapped.colors[0]);
+          }
+          if (mapped.sizes && mapped.sizes.length > 0) {
+            setSelectedSize(mapped.sizes[0]);
+          }
           setQuantity(1);
 
           if (Array.isArray(wList)) {
@@ -288,11 +300,78 @@ const Details = () => {
                 </ul>
               </div>
             )}
+
+            {/* Colors Section */}
+            {product.colors && product.colors.length > 0 && (
+              <div className="variations-section">
+                <h3>Available Colors</h3>
+                <div className="color-selector">
+                  {product.colors.map((color) => (
+                    <button
+                      key={color}
+                      className={`color-option ${selectedColor === color ? 'selected' : ''}`}
+                      onClick={() => setSelectedColor(color)}
+                      title={color}
+                      style={{
+                        backgroundColor: isValidColor(color) ? color : '#ccc',
+                        border: selectedColor === color ? '3px solid rgb(255, 102, 0)' : '2px solid #ddd'
+                      }}
+                    >
+                      {!isValidColor(color) && <span className="color-label">{color}</span>}
+                    </button>
+                  ))}
+                </div>
+                {selectedColor && <p className="selected-option">Selected: <strong>{selectedColor}</strong></p>}
+              </div>
+            )}
+
+            {/* Sizes Section */}
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="variations-section">
+                <h3>Available Sizes</h3>
+                <div className="size-selector">
+                  {product.sizes.map((size) => (
+                    <button
+                      key={size}
+                      className={`size-option ${selectedSize === size ? 'selected' : ''}`}
+                      onClick={() => setSelectedSize(size)}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+                {selectedSize && <p className="selected-option">Selected: <strong>{selectedSize}</strong></p>}
+              </div>
+            )}
+
+            {/* Specifications Section */}
+            {product.specifications && Object.keys(product.specifications).length > 0 && (
+              <div className="specifications-section">
+                <h3>Specifications</h3>
+                <table className="specs-table">
+                  <tbody>
+                    {Object.entries(product.specifications).map(([key, value]) => (
+                      <tr key={key}>
+                        <td className="spec-label">{key}</td>
+                        <td className="spec-value">{String(value)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+// Helper function to check if a string is a valid CSS color
+function isValidColor(strColor) {
+  const s = new Option().style;
+  s.color = strColor;
+  return s.color !== '';
+}
 
 export default Details;

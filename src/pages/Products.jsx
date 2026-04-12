@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getProducts, getWishlist, addToWishlist, removeFromWishlist, addToCart } from "../api";
 import ProductsCard from "../components/ProductsCard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Products({ items: propItems, searchQuery }) {
@@ -12,7 +12,17 @@ export default function Products({ items: propItems, searchQuery }) {
   const [sortOrder, setSortOrder] = useState('');
   const [cartMessage, setCartMessage] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const { openAuthModal } = useAuth();
+
+  // Get category from URL params
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const category = searchParams.get('category');
+    if (category) {
+      setCategoryFilter(category);
+    }
+  }, [location]);
 
   useEffect(() => {
     let mounted = true;

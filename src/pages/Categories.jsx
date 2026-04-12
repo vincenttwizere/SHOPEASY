@@ -2,6 +2,7 @@ import image5 from "../assets/Electronics.jpg";
 import image6 from "../assets/Fashion.jpg"
 import image7 from "../assets/Accessories.jpg"
 import image8 from "../assets/Home and living.jpg"
+import { useNavigate } from "react-router-dom";
 
 const categories = [
   {
@@ -31,6 +32,12 @@ const categories = [
 ];
 
 export default function Categories() {
+  const navigate = useNavigate();
+
+  const handleViewProducts = (categoryName) => {
+    navigate(`/products?category=${encodeURIComponent(categoryName)}`);
+  };
+
   return (
     <div className="categories-page">
 
@@ -50,7 +57,10 @@ export default function Categories() {
               <h3>{category.name}</h3>
               <p>{category.description}</p>
 
-              <button className="category-btn">
+              <button 
+                className="category-btn"
+                onClick={() => handleViewProducts(category.name)}
+              >
                 View Products
               </button>
             </div>
