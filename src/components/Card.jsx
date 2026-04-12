@@ -9,6 +9,7 @@ import {
   Home,
   Heart,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // Map icon strings to icon components
 const iconMap = {
@@ -29,12 +30,17 @@ const iconMap = {
 const showButtonFor = ["Electronics", "Fashion", "Home & Kitchen", "Beauty & Health"];
 
 const Card = ({ title, description, icon }) => {
+  const navigate = useNavigate();
   const Icon = iconMap[icon];
 
   if (!Icon) {
     console.error(`Invalid icon prop: "${icon}"`);
     return null;
   }
+
+  const handleBrowse = () => {
+    navigate(`/products?category=${encodeURIComponent(title)}`);
+  };
 
   return (
     <div className="card">
@@ -46,7 +52,9 @@ const Card = ({ title, description, icon }) => {
       <p className="card-description">{description}</p>
 
       {showButtonFor.includes(icon) && (
-        <button className="card-button">Browse</button>
+        <button className="card-button" onClick={handleBrowse}>
+          Browse
+        </button>
       )}
     </div>
   );
