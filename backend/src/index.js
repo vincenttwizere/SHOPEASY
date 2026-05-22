@@ -9,6 +9,7 @@ const orderRoutes = require('./routes/orders');
 const userRoutes = require('./routes/users');
 const uploadRoutes = require('./routes/upload');
 const analyticsRoutes = require('./routes/analytics');
+const categoryRoutes = require('./routes/categories');
 const paymentRoutes = require('./routes/payment');
 const { errorHandler } = require('./middleware/errorHandler');
 
@@ -45,6 +46,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);

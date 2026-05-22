@@ -11,7 +11,8 @@ router.get('/:id', orderController.getOrder);
 
 // Admin routes
 router.get('/admin/all', requireRole('admin'), orderController.getAllOrders);
-router.patch('/admin/:id/status', requireRole('admin'), orderController.updateOrderStatus);
 router.get('/admin/stats', requireRole('admin'), orderController.getUserStats);
+router.get('/admin/:id', requireRole('admin'), orderController.getOrderAdmin);
+router.patch('/admin/:id/status', requireRole('admin'), orderController.updateOrderStatus);
 
 module.exports = router;

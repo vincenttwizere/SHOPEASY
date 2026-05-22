@@ -116,11 +116,11 @@ export default function AdminLayout({ onLogout, user }) {
                         <input type="text" placeholder="Search..." />
                     </div>
                     <div className="top-bar-actions">
-                        <button className="icon-btn-top">
+                        <button className="icon-btn-top" onClick={() => navigate('/admin/messages')} title="Messages">
                             <MessageSquare size={20} />
                             <span className="notification-dot"></span>
                         </button>
-                        <button className="icon-btn-top">
+                        <button className="icon-btn-top" onClick={() => navigate('/admin/orders')} title="Orders">
                             <ShoppingCart size={20} />
                             <span className="notification-badge">3</span>
                         </button>

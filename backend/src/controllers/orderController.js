@@ -93,6 +93,27 @@ async function getAllOrders(req, res, next) {
   }
 }
 
+// Admin: Get order details
+async function getOrderAdmin(req, res, next) {
+  try {
+    const orderId = req.params.id;
+    const [orders] = await db.query(
+      `SELECT o.id, o.user_id, u.name as user_name, u.email, o.total, o.status, o.created_at 
+       FROM orders o 
+       JOIN users u ON o.user_id = u.id 
+       WHERE o.id = ?`, [orderId]
+    );
+    if (!orders.length) return res.status(404).json({ message: 'Order not found' });
+    const [items] = await db.query(
+      'SELECT oi.product_id, oi.quantity, oi.unit_price, p.name FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?', 
+      [orderId]
+    );
+    res.json({ order: orders[0], items });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // Admin: Update order status
 async function updateOrderStatus(req, res, next) {
   try {
@@ -121,4 +142,4 @@ async function getUserStats(req, res, next) {
   }
 }
 
-module.exports = { placeOrder, listOrders, getOrder, getAllOrders, updateOrderStatus, getUserStats };
+module.exports = { placeOrder, listOrders, getOrder, getAllOrders, getOrderAdmin, updateOrderStatus, getUserStats };

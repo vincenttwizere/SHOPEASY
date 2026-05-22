@@ -11,7 +11,9 @@ const ProductsCard = ({
     inWishlist,
     onToggleWishlist,
     onAddToCart,
-    onBuyNow
+    onBuyNow,
+    colors = [],
+    sizes = []
 }) => {
     const navigate = useNavigate();
     const discount = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
@@ -43,6 +45,34 @@ const ProductsCard = ({
                     <span className="current-price">${Number(price).toFixed(2)}</span>
                     {originalPrice && Number(originalPrice) > Number(price) && (
                         <span className="original-price">${Number(originalPrice).toFixed(2)}</span>
+                    )}
+                </div>
+
+                {/* Colors and Sizes Display */}
+                <div className="product-variants">
+                    {colors && colors.length > 0 && (
+                        <div className="variant-group">
+                            <span className="variant-label">Colors:</span>
+                            <div className="color-options">
+                                {colors.map((color, idx) => (
+                                    <span key={idx} className="color-badge" title={color}>
+                                        <span className="color-swatch" style={{ backgroundColor: color }}></span>
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {sizes && sizes.length > 0 && (
+                        <div className="variant-group">
+                            <span className="variant-label">Sizes:</span>
+                            <div className="size-options">
+                                {sizes.map((size, idx) => (
+                                    <span key={idx} className="size-badge">
+                                        {size}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
                     )}
                 </div>
 

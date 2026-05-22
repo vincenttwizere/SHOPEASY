@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { BASE_URL } from '../../api';
 import { FileText, Download, Send, Printer, Eye } from 'lucide-react';
+import InvoiceModal from '../../components/InvoiceModal';
 
 export default function AdminInvoice() {
     const [invoices, setInvoices] = useState([]);
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedInvoice, setSelectedInvoice] = useState(null);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         fetchData();
@@ -82,7 +85,7 @@ export default function AdminInvoice() {
                         <option value="">Select an order...</option>
                         {orders.filter(o => !invoices.find(inv => inv.orderId === o.id)).map(order => (
                             <option key={order.id} value={order.id}>
-                                Order #{order.id} - {order.user_name} - ${order.total.toFixed(2)}
+                                Order #{order.id} - {order.user_name} - ${Number(order.total).toFixed(2)}
                             </option>
                         ))}
                     </select>
@@ -114,7 +117,7 @@ export default function AdminInvoice() {
                                 </td>
                                 <td>#{invoice.orderId}</td>
                                 <td>{invoice.customerName}</td>
-                                <td className="amount">${invoice.total.toFixed(2)}</td>
+                                <td className="amount">${Number(invoice.total).toFixed(2)}</td>
                                 <td>
                                     <span className={`status-badge ${invoice.status}`}>
                                         {invoice.status}
@@ -123,7 +126,7 @@ export default function AdminInvoice() {
                                 <td>{new Date(invoice.createdAt).toLocaleDateString()}</td>
                                 <td>
                                     <div className="action-buttons">
-                                        <button className="icon-btn" onClick={() => alert('View invoice')} title="View">
+                                        <button className="icon-btn" onClick={() => { setSelectedInvoice(invoice); setShowModal(true); }} title="View">
                                             <Eye size={16} />
                                         </button>
                                         <button className="icon-btn" onClick={() => downloadPDF(invoice)} title="Download PDF">
@@ -150,6 +153,13 @@ export default function AdminInvoice() {
                     </div>
                 )}
             </div>
+
+            {/* Invoice Modal */}
+            <InvoiceModal 
+                isOpen={showModal} 
+                onClose={() => { setShowModal(false); setSelectedInvoice(null); }} 
+                invoice={selectedInvoice} 
+            />
         </div>
     );
 }

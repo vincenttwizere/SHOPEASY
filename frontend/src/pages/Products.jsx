@@ -19,10 +19,8 @@ export default function Products({ items: propItems, searchQuery }) {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const category = searchParams.get('category');
-    if (category) {
-      setCategoryFilter(category);
-    }
-  }, [location]);
+    setCategoryFilter(category || 'all');
+  }, [location.search]);
 
   useEffect(() => {
     let mounted = true;
@@ -31,8 +29,8 @@ export default function Products({ items: propItems, searchQuery }) {
       try {
         const token = localStorage.getItem('token');
         
-        // Fetch products
-        const data = await getProducts(searchQuery);
+        // Fetch products with optional category filter
+        const data = await getProducts({ q: searchQuery, category: categoryFilter !== 'all' ? categoryFilter : undefined });
         
         // Only fetch wishlist if user is authenticated
         let wishlistData = [];
@@ -40,7 +38,6 @@ export default function Products({ items: propItems, searchQuery }) {
           try {
             wishlistData = await getWishlist();
           } catch {
-            // Silently handle wishlist fetch errors
             wishlistData = [];
           }
         }
@@ -54,7 +51,9 @@ export default function Products({ items: propItems, searchQuery }) {
           images: p.images || [],
           description: p.description || '',
           category: p.category || '',
-          features: p.features || []
+          features: p.features || [],
+          colors: typeof p.colors === 'string' ? JSON.parse(p.colors || '[]') : (p.colors || []),
+          sizes: typeof p.sizes === 'string' ? JSON.parse(p.sizes || '[]') : (p.sizes || [])
         }));
 
         if (mounted) {
@@ -71,7 +70,7 @@ export default function Products({ items: propItems, searchQuery }) {
     }
     load();
     return () => { mounted = false; };
-  }, [searchQuery]);
+  }, [searchQuery, categoryFilter]);
 
   const toggleWishlist = async (productId) => {
     const token = localStorage.getItem('token');

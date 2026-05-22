@@ -37,8 +37,18 @@ async function request(path, opts = {}) {
 }
 
 // Products
-export async function getProducts(q) {
-  const url = q ? `/api/products?q=${encodeURIComponent(q)}` : '/api/products';
+export async function getProducts(query = {}) {
+  let url = '/api/products';
+  const params = new URLSearchParams();
+
+  if (typeof query === 'string') {
+    if (query) params.set('q', query);
+  } else if (query && typeof query === 'object') {
+    if (query.q) params.set('q', query.q);
+    if (query.category) params.set('category', query.category);
+  }
+
+  if ([...params].length) url += `?${params.toString()}`;
   return request(url);
 }
 
@@ -64,6 +74,8 @@ export function saveToken(token) { localStorage.setItem('token', token); }
 export function clearToken() { localStorage.removeItem('token'); }
 
 // Cart
+export async function getCategories() { return request('/api/categories'); }
+
 export async function getCart() { return request('/api/cart'); }
 export async function addToCart(payload) { return request('/api/cart/items', { method: 'POST', body: JSON.stringify(payload) }); }
 export async function updateCartItem(itemId, payload) { return request(`/api/cart/items/${itemId}`, { method: 'PUT', body: JSON.stringify(payload) }); }
@@ -104,4 +116,4 @@ export async function processRwandanPayment(paymentData) {
   return request('/api/payment/rwandan', { method: 'POST', body: JSON.stringify(paymentData) });
 }
 
-export default { getProducts, getProduct, register, login, saveToken, clearToken, getCart, addToCart, updateCartItem, removeCartItem, placeOrder, getOrders, getWishlist, addToWishlist, removeFromWishlist, createPaymentIntent, confirmPayment, getPaymentStatus, processRwandanPayment };
+export default { getProducts, getProduct, register, login, saveToken, clearToken, getCategories, getCart, addToCart, updateCartItem, removeCartItem, placeOrder, getOrders, getWishlist, addToWishlist, removeFromWishlist, createPaymentIntent, confirmPayment, getPaymentStatus, processRwandanPayment };

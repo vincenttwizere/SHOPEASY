@@ -10,15 +10,21 @@ function ProductForm({ initial = {}, onSave, onCancel }) {
     quantity: 0,
     category: '',
     image_url: '',
+    colors: [],
+    sizes: [],
     ...initial
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(initial.image_url || '');
+  const [colorInput, setColorInput] = useState('');
+  const [sizeInput, setSizeInput] = useState('');
 
   useEffect(() => {
-    setForm({ name: '', description: '', price: '', quantity: 0, category: '', image_url: '', ...initial });
+    setForm({ name: '', description: '', price: '', quantity: 0, category: '', image_url: '', colors: [], sizes: [], ...initial });
     setImagePreview(initial.image_url || '');
     setImageFile(null);
+    setColorInput('');
+    setSizeInput('');
   }, [initial]);
 
   const handleImageChange = (e) => {
@@ -31,6 +37,14 @@ function ProductForm({ initial = {}, onSave, onCancel }) {
 
   const handleSubmit = async () => {
     let finalForm = { ...form };
+
+    // Convert colors and sizes to JSON if they're arrays
+    if (Array.isArray(finalForm.colors)) {
+      finalForm.colors = JSON.stringify(finalForm.colors);
+    }
+    if (Array.isArray(finalForm.sizes)) {
+      finalForm.sizes = JSON.stringify(finalForm.sizes);
+    }
 
     if (imageFile) {
       const formData = new FormData();
@@ -144,6 +158,121 @@ function ProductForm({ initial = {}, onSave, onCancel }) {
                 onChange={(e) => setForm({ ...form, quantity: e.target.value })}
               />
             </div>
+          </div>
+
+          <div className="form-group">
+            <label>Available Colors (comma-separated or hex codes)</label>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+              <input
+                type="text"
+                placeholder="e.g., #FF6600, Red, Blue"
+                value={colorInput}
+                onChange={(e) => setColorInput(e.target.value)}
+              />
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => {
+                  if (colorInput.trim()) {
+                    const newColors = colorInput.split(',').map(c => c.trim()).filter(c => c);
+                    setForm({ ...form, colors: [...form.colors, ...newColors] });
+                    setColorInput('');
+                  }
+                }}
+              >
+                Add
+              </button>
+            </div>
+            {form.colors && form.colors.length > 0 && (
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {form.colors.map((color, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      background: '#f0f0f0',
+                      padding: '4px 8px',
+                      borderRadius: '4px'
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '3px',
+                        backgroundColor: color,
+                        border: '1px solid #ddd'
+                      }}
+                    />
+                    <span>{color}</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setForm({ ...form, colors: form.colors.filter((_, i) => i !== idx) })
+                      }
+                      style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#ef4444' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label>Available Sizes (comma-separated)</label>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+              <input
+                type="text"
+                placeholder="e.g., XS, S, M, L, XL"
+                value={sizeInput}
+                onChange={(e) => setSizeInput(e.target.value)}
+              />
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => {
+                  if (sizeInput.trim()) {
+                    const newSizes = sizeInput.split(',').map(s => s.trim()).filter(s => s);
+                    setForm({ ...form, sizes: [...form.sizes, ...newSizes] });
+                    setSizeInput('');
+                  }
+                }}
+              >
+                Add
+              </button>
+            </div>
+            {form.sizes && form.sizes.length > 0 && (
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {form.sizes.map((size, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      background: '#f0f0f0',
+                      padding: '4px 8px',
+                      borderRadius: '4px'
+                    }}
+                  >
+                    <span>{size}</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setForm({ ...form, sizes: form.sizes.filter((_, i) => i !== idx) })
+                      }
+                      style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#ef4444' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

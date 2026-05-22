@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Menu, X, ShoppingCart, Heart, User } from "lucide-react";
+import { Search, Menu, X, ShoppingCart, Heart, User, LogOut } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const Navbar = ({ onSearch, user, onAccountClick, onLogout }) => {
@@ -8,7 +8,31 @@ const Navbar = ({ onSearch, user, onAccountClick, onLogout }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const userDropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  // Extract initials from user name
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+        setUserDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleAccountClick = () => {
     if (user) {
@@ -72,13 +96,50 @@ const Navbar = ({ onSearch, user, onAccountClick, onLogout }) => {
               <User size={20} style={{ marginRight: 6 }} /> Account
             </button>
           ) : (
-            <div className="account-dropdown">
-              <button className="btn" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <User size={20} />
-                {user.name || 'Account'}
+            <div className="user-account-wrapper" ref={userDropdownRef}>
+              <button 
+                className="user-avatar-btn" 
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                title={user.name}
+              >
+                <div className="user-avatar">
+                  {getInitials(user.name)}
+                </div>
               </button>
-              {/* Simple logout trigger for now, could be a dropdown later */}
-              <button className="btn logout-btn" onClick={() => onLogout && onLogout()} style={{ marginLeft: 4, fontSize: 12 }}>Logout</button>
+              
+              {userDropdownOpen && (
+                <div className="user-dropdown-menu">
+                  <div className="user-dropdown-header">
+                    <span className="user-name">{user.name}</span>
+                    <span className="user-email">{user.email}</span>
+                  </div>
+                  <div className="user-dropdown-divider"></div>
+                  {user.role === 'admin' && (
+                    <>
+                      <button 
+                        className="user-dropdown-item"
+                        onClick={() => {
+                          navigate('/admin');
+                          setUserDropdownOpen(false);
+                        }}
+                      >
+                        Admin Dashboard
+                      </button>
+                      <div className="user-dropdown-divider"></div>
+                    </>
+                  )}
+                  <button 
+                    className="user-dropdown-item logout-item"
+                    onClick={() => {
+                      onLogout && onLogout();
+                      setUserDropdownOpen(false);
+                    }}
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
